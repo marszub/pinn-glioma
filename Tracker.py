@@ -18,7 +18,7 @@ class Tracker:
         self.bestLoss = float('inf')
 
     def start(self, initialCondition: Callable):
-        plot_initial_condition(self.space, initialCondition)
+        plot_initial_condition(self.space, initialCondition, self.logDir + "/initial_condition.png")
         self.epochStartTime = time()
         self.epoch = 0
 
@@ -45,7 +45,7 @@ class Tracker:
         save(pinn.state_dict(), self.logDir + "/model")
         write_loss(self.lossValues[-1])
         self.plotLoss()
-        animate_progress(pinn, self.space)
+        animate_progress(pinn, self.space, self.logDir)
 
     def plotLoss(self):
         losses = np.array(self.lossValues)

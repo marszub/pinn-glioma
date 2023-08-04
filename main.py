@@ -24,13 +24,13 @@ if __name__ == "__main__":
     )
     learnSpace = SampleSpace(
         timespaceDomain=timespace,
-        spaceResoultion=40,
-        timeResoultion=40,
+        spaceResoultion=35,
+        timeResoultion=35,
     )
 
-    tracker = Tracker("./tmp", plotSpace)
+    tracker = Tracker("../tmp", plotSpace)
 
-    pinn = PINN(layers=4, neuronsPerLayer=200, act=nn.Tanh()).to(device)
+    pinn = PINN(layers=4, neuronsPerLayer=160, act=nn.Tanh()).to(device)
 
     weights = Weights(residual=1.0, initial=1.0, boundary=1.0)
     loss = Loss(
@@ -40,4 +40,4 @@ if __name__ == "__main__":
     )
 
     trainer = Trainer(pinn, loss, tracker)
-    trainer.train(learning_rate=0.002, max_epochs=100_000)
+    trainer.train(learning_rate=0.005, max_epochs=100_000)

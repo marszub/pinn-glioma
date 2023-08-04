@@ -114,7 +114,7 @@ def plot_losses(loss_over_time, filePath, labels=[]):
     plt.close()
 
 
-def plot_initial_condition(space: SampleSpace, initialCondition: Callable):
+def plot_initial_condition(space: SampleSpace, initialCondition: Callable, filePath):
     x, y, _ = get_initial_points(space, requires_grad=False)
     z = initialCondition(x, y)
     fig = plot_color(
@@ -125,11 +125,11 @@ def plot_initial_condition(space: SampleSpace, initialCondition: Callable):
         space.spaceResoultion,
         "Initial condition - exact",
     )
-    plt.savefig("./tmp/initial_condition.png", transparent=True)
+    plt.savefig(filePath, transparent=True)
     plt.close()
 
 
-def animate_progress(pinn: PINN, space: SampleSpace):
+def animate_progress(pinn: PINN, space: SampleSpace, dirPath):
     for i in range(space.timeResoultion):
         x, y, _ = get_initial_points(space, requires_grad=False)
         t = full_like(
@@ -147,6 +147,6 @@ def animate_progress(pinn: PINN, space: SampleSpace):
             z, x, y, space.spaceResoultion, space.spaceResoultion, "PINN"
         )
         plt.savefig(
-            f"./tmp/img_{i}.png", transparent=True, facecolor="white"
+            dirPath + f"/img_{i}.png", transparent=True, facecolor="white"
         )
         plt.close()
