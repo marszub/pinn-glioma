@@ -1,5 +1,5 @@
 import torch
-from SampleSpace import SampleSpace
+from  simulationSpace import SampleSpace
 
 def get_boundary_points(
     space: SampleSpace,

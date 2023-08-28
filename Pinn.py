@@ -19,7 +19,7 @@ class PINN(nn.Module):
         self.act = act
 
     def forward(self, x, y, t):
-        x_stack = torch.cat([x, y, t], dim=1)
+        x_stack = torch.cat([x, y, t], dim=-1)
         out = self.act(self.layer_in(x_stack))
         for layer in self.middle_layers:
             out = self.act(layer(out))

@@ -2,10 +2,10 @@ from typing import Callable
 import numpy as np
 from Pinn import PINN
 import matplotlib.pyplot as plt
-from SampleSpace import SampleSpace
-from Samples import get_initial_points
 from torch import Tensor, full_like, unique, ones_like
 from matplotlib.animation import FuncAnimation
+
+from simulationSpace.UniformSpace import UniformSpace
 
 
 def running_average(y, window=100):
@@ -17,24 +17,19 @@ def plot_color(
     z: Tensor,
     x: Tensor,
     y: Tensor,
-    n_points_x,
-    n_points_t,
     title,
     figsize=(8, 6),
     dpi=100,
     cmap="viridis",
 ):
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
-    z_raw = z.detach().cpu().numpy()
-    x_raw = x.detach().cpu().numpy()
-    y_raw = y.detach().cpu().numpy()
-    X = x_raw.reshape(n_points_x, n_points_t)
-    Y = y_raw.reshape(n_points_x, n_points_t)
-    Z = z_raw.reshape(n_points_x, n_points_t)
+    X = x.detach().cpu().numpy()
+    Y = y.detach().cpu().numpy()
+    Z = z.detach().cpu().numpy()
     ax.set_title(title)
     ax.set_xlabel("x")
     ax.set_ylabel("y")
-    c = ax.pcolormesh(X, Y, Z, cmap=cmap)
+    c = ax.pcolormesh(np.squeeze(X, axis=-1), np.squeeze(Y, axis=-1), np.squeeze(Z, axis=-1), cmap=cmap)
     fig.colorbar(c, ax=ax)
 
     return fig
@@ -114,24 +109,22 @@ def plot_losses(loss_over_time, filePath, labels=[]):
     plt.close()
 
 
-def plot_initial_condition(space: SampleSpace, initialCondition: Callable, filePath):
-    x, y, _ = get_initial_points(space, requires_grad=False)
+def plot_initial_condition(space: UniformSpace, initialCondition: Callable, filePath):
+    x, y, _ = space.getInitialPointsKeepDims()
     z = initialCondition(x, y)
     fig = plot_color(
         z,
         x,
         y,
-        space.spaceResoultion,
-        space.spaceResoultion,
         "Initial condition - exact",
     )
     plt.savefig(filePath, transparent=True)
     plt.close()
 
 
-def animate_progress(pinn: PINN, space: SampleSpace, dirPath):
+def animate_progress(pinn: PINN, space: UniformSpace, dirPath):
     for i in range(space.timeResoultion):
-        x, y, _ = get_initial_points(space, requires_grad=False)
+        x, y, _ = space.getInitialPointsKeepDims()
         t = full_like(
             x,
             space.timespaceDomain.timeDomain[0]
@@ -144,7 +137,7 @@ def animate_progress(pinn: PINN, space: SampleSpace, dirPath):
         )
         z = pinn(x, y, t)
         fig = plot_color(
-            z, x, y, space.spaceResoultion, space.spaceResoultion, "PINN"
+            z, x, y, "PINN"
         )
         plt.savefig(
             dirPath + f"/img_{i}.png", transparent=True, facecolor="white"

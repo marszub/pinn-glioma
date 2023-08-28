@@ -62,16 +62,14 @@ def dfdy(
     return df(f_value, y, order=order)
 
 
-class Loss:
+class InitialLoss:
     def __init__(
         self,
         space: SampleSpace,
         initialCondition: Callable,
-        weights: Weights,
     ):
         self.space = space
         self.initialCondition = initialCondition
-        self.weighs = weights
 
     def __residual(self, pinn: PINN):
         x, y, t = self.space.getInteriorPoints()
@@ -136,11 +134,7 @@ class Loss:
         initial_loss = self.__initial(pinn)
         boundary_loss = self.__boundary(pinn)
 
-        final_loss = (
-            self.weighs.residual * residual_loss
-            + self.weighs.initial * initial_loss
-            + self.weighs.boundary * boundary_loss
-        )
+        final_loss = initial_loss
 
         return final_loss, residual_loss, initial_loss, boundary_loss
 

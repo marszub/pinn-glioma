@@ -5,12 +5,13 @@ from typing import Callable
 
 import numpy as np
 from Pinn import PINN
-from SampleSpace import SampleSpace
 from Visualize import animate_progress, plot_initial_condition, plot_losses, write_loss
 from torch import save
 
+from simulationSpace.UniformSpace import UniformSpace
+
 class Tracker:
-    def __init__(self, logDir: str, plotSpace: SampleSpace):
+    def __init__(self, logDir: str, plotSpace: UniformSpace):
         makedirs(logDir, exist_ok=True)
         self.logDir = logDir
         self.space = plotSpace
@@ -32,7 +33,7 @@ class Tracker:
                 f"Epoch: {self.epoch + 1}\tLoss: {float(totalLoss):>7f}\t"
                 + f"Time: {time() - self.epochStartTime:.1f}s"
             )
-            self.plotLoss()
+            self.__plotLoss()
             self.epochStartTime = time()
 
         if totalLoss < self.bestLoss:
@@ -41,13 +42,13 @@ class Tracker:
         self.epoch += 1
 
     def finish(self, pinn: PINN):
-        pinn = pinn.cpu()
-        save(pinn.state_dict(), self.logDir + "/model")
+        bestApprox = self.bestApprox.cpu()
+        save(bestApprox.state_dict(), self.logDir + "/model")
         write_loss(self.lossValues[-1])
-        self.plotLoss()
-        animate_progress(pinn, self.space, self.logDir)
+        self.__plotLoss()
+        animate_progress(bestApprox, self.space, self.logDir)
 
-    def plotLoss(self):
+    def __plotLoss(self):
         losses = np.array(self.lossValues)
         plot_losses(losses[:, 0], filePath=self.logDir + "/loss_total.png")
         plot_losses(losses[:, 1:], labels=["Residual", "Initial", "Boundary"], filePath=self.logDir + "/loss_components.png")

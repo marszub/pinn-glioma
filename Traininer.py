@@ -1,5 +1,4 @@
 from typing import Callable
-import numpy as np
 from Pinn import PINN
 from Tracker import Tracker
 import torch
@@ -13,13 +12,13 @@ class Trainer:
 
     def train(
         self,
-        learning_rate: int = 0.01,
+        learning_rate: int = 0.005,
         max_epochs: int = 1_000,
     ) -> PINN:
         optimizer = torch.optim.Adam(
             self.nn.parameters(), lr=learning_rate
         )
-        self.tracker.start(self.loss.initial_condition)
+        self.tracker.start(self.loss.initialCondition)
         for _ in range(max_epochs):
             try:
                 loss: torch.Tensor = self.loss(self.nn)
@@ -29,5 +28,5 @@ class Trainer:
 
                 self.tracker.update(self.loss.verbose(self.nn), self.nn)
             except KeyboardInterrupt:
-                self.tracker.finish(self.nn)
                 break
+        self.tracker.finish(self.nn)
