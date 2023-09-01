@@ -1,6 +1,5 @@
 from typing import Tuple
 from torch import Tensor, sqrt
-from TimespaceDomain import TimespaceDomain
 
 def initial_condition(x: Tensor, y: Tensor) -> Tensor:
     d = sqrt((x - 0.6) ** 2 + (y - 0.6) ** 2)

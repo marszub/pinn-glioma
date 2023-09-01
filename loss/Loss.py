@@ -1,5 +1,5 @@
-from typing import Tuple
 from typing import Callable
+from loss.Treatment import Treatment
 from simulationSpace.SampleSpace import SampleSpace
 import torch
 from torch import Tensor
@@ -67,10 +67,12 @@ class Loss:
         self,
         space: SampleSpace,
         initialCondition: Callable,
+        treatment: Treatment,
         weights: Weights,
     ):
         self.space = space
         self.initialCondition = initialCondition
+        self.treatment = treatment
         self.weighs = weights
 
     def __residual(self, pinn: PINN):
@@ -90,6 +92,7 @@ class Loss:
         #     res[dist >= 0.25] = 0
         #     return res
         D = D_fun(x, y)
+        R = self.treatment(x, y, t)
         # mask = D > 0
         u = f(pinn, x, y, t)
         # Phi = phi(x, y)
@@ -98,6 +101,7 @@ class Loss:
             - D * dfdx(pinn, x, y, t, order=2)
             - D * dfdy(pinn, x, y, t, order=2)
             - rho * u * (1 - u)
+            + R * u
         )
         # loss = mask * loss + torch.logical_not(mask) * u
         return loss.pow(2).mean()

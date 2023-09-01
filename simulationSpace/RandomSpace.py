@@ -1,5 +1,5 @@
 import torch
-from TimespaceDomain import TimespaceDomain
+from simulationSpace.TimespaceDomain import TimespaceDomain
 from simulationSpace.SampleSpace import SampleSpace
 
 class RandomSpace(SampleSpace):

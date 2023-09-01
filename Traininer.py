@@ -3,6 +3,8 @@ from Pinn import PINN
 from Tracker import Tracker
 import torch
 
+from menu.PauseMenu import PauseMenu
+
 
 class Trainer:
     def __init__(self, nn: PINN, loss: Callable, tracker: Tracker):
@@ -28,5 +30,8 @@ class Trainer:
 
                 self.tracker.update(self.loss.verbose(self.nn), self.nn)
             except KeyboardInterrupt:
-                break
+                pauseMenu = PauseMenu(self.tracker)
+                pauseMenu.run()
+                if pauseMenu.shouldTerminate():
+                    break
         self.tracker.finish(self.nn)

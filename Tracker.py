@@ -24,13 +24,14 @@ class Tracker:
         self.epoch = 0
 
     def update(self, lossValue: tuple, nn: PINN):
+        self.epoch += 1
         lossValue = list(map(lambda element: element.item(), lossValue))
         self.lossValues.append(lossValue)
 
         totalLoss = lossValue[0]
-        if (self.epoch + 1) % 1000 == 0:
+        if (self.epoch) % 1000 == 0:
             print(
-                f"Epoch: {self.epoch + 1}\tLoss: {float(totalLoss):>7f}\t"
+                f"Epoch: {self.epoch}\tLoss: {float(totalLoss):>7f}\t"
                 + f"Time: {time() - self.epochStartTime:.1f}s"
             )
             self.__plotLoss()
@@ -39,14 +40,16 @@ class Tracker:
         if totalLoss < self.bestLoss:
             self.bestApprox = deepcopy(nn)
             self.bestLoss = totalLoss
-        self.epoch += 1
 
     def finish(self, pinn: PINN):
         bestApprox = self.bestApprox.cpu()
         save(bestApprox.state_dict(), self.logDir + "/model")
         write_loss(self.lossValues[-1])
         self.__plotLoss()
-        animate_progress(bestApprox, self.space, self.logDir)
+        self.animate()
+
+    def animate(self):
+        animate_progress(self.bestApprox.cpu(), self.space, self.logDir)
 
     def __plotLoss(self):
         losses = np.array(self.lossValues)
