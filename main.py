@@ -1,3 +1,4 @@
+from loss.DiffusionMap import DiffusionMap
 from loss.Treatment import Treatment
 from simulationSpace.RandomSpace import RandomSpace
 from simulationSpace.TimespaceDomain import TimespaceDomain
@@ -19,6 +20,7 @@ if __name__ == "__main__":
         spaceDomains=[(0.0, 100.0), (0.0, 100.0)],
         timeDomain=(0.0, 100.0),
     )
+    diffusion = DiffusionMap(timespace, device)
     treatment = Treatment(absorptionRate=2.0, decayRate=0.02, dose=0.02, firstDoseTime=10.0, dosesNum=3, timeBetweenDoses=30.0)
 
     plotSpace = UniformSpace(
@@ -35,7 +37,7 @@ if __name__ == "__main__":
     )
     initialCondition = InitialCondition((60.0, 60.0), 0.4, 10)
 
-    tracker = Tracker("../tmp", plotSpace)
+    tracker = Tracker("tmp", plotSpace)
 
     pinn = PINN(layers=4, neuronsPerLayer=120, act=nn.Tanh()).to(device)
 
@@ -44,6 +46,7 @@ if __name__ == "__main__":
     loss = Loss(
         learnRandom,
         initialCondition,
+        diffusion,
         treatment,
         weights,
     )
