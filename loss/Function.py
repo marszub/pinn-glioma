@@ -2,16 +2,13 @@ import torch
 from Pinn import PINN
 from torch import Tensor
 
-def f(
-    pinn: PINN, x: Tensor, y: Tensor, t: Tensor
-) -> Tensor:
+
+def f(pinn: PINN, x: Tensor, y: Tensor, t: Tensor) -> Tensor:
     """Compute the value of the approximate solution from the NN model"""
     return pinn(x, y, t)
 
 
-def df(
-    output: Tensor, input: Tensor, order: int = 1
-) -> Tensor:
+def df(output: Tensor, input: Tensor, order: int = 1) -> Tensor:
     """Compute neural network derivative with respect to input features using PyTorch autograd engine"""
     df_value = output
     for _ in range(order):

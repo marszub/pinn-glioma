@@ -1,18 +1,21 @@
+from Initializer import Initializer
+from menu.ArgsParser import ArgsParser
 from loss.DiffusionMap import DiffusionMap
 from loss.Treatment import Treatment
 from simulationSpace.RandomSpace import RandomSpace
 from simulationSpace.TimespaceDomain import TimespaceDomain
-from Tracker import Tracker
 import torch
-from torch import nn
 from loss.Loss import Loss
-from Pinn import PINN
 from InitialCondition import InitialCondition
 from Traininer import Trainer
 from Weights import Weights
-from simulationSpace.UniformSpace import UniformSpace
 
 if __name__ == "__main__":
+    argsParser = ArgsParser()
+    argsParser.show()
+    config = argsParser.get()
+    initializer = Initializer(config)
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(device)
 
@@ -21,14 +24,10 @@ if __name__ == "__main__":
         timeDomain=(0.0, 100.0),
     )
     diffusion = DiffusionMap(timespace, device)
-    treatment = Treatment(absorptionRate=2.0, decayRate=0.02, dose=0.02, firstDoseTime=10.0, dosesNum=3, timeBetweenDoses=30.0)
+    treatment00 = Treatment(absorptionRate=2.0, decayRate=0.02, dose=0.00, firstDoseTime=10.0, dosesNum=3, timeBetweenDoses=30.0)
+    treatment01 = Treatment(absorptionRate=2.0, decayRate=0.02, dose=0.02, firstDoseTime=10.0, dosesNum=3, timeBetweenDoses=30.0)
+    treatment02 = Treatment(absorptionRate=2.0, decayRate=0.02, dose=0.05, firstDoseTime=50.0, dosesNum=2, timeBetweenDoses=20.0)
 
-    plotSpace = UniformSpace(
-        timespaceDomain=timespace,
-        spaceResoultion=150,
-        timeResoultion=20,
-        requiresGrad=False,
-    )
     learnRandom = RandomSpace(
         timespaceDomain=timespace,
         initialSize=35*35,
@@ -37,9 +36,9 @@ if __name__ == "__main__":
     )
     initialCondition = InitialCondition((60.0, 60.0), 0.4, 10)
 
-    tracker = Tracker("tmp", plotSpace)
+    tracker = initializer.getTracker(timespace=timespace)
 
-    pinn = PINN(layers=4, neuronsPerLayer=120, act=nn.Tanh()).to(device)
+    pinn = initializer.getModel().to(device)
 
     weights = Weights(residual=1.0, initial=1.0, boundary=1.0)
     
@@ -47,8 +46,8 @@ if __name__ == "__main__":
         learnRandom,
         initialCondition,
         diffusion,
-        treatment,
+        treatment00,
         weights,
     )
     trainer = Trainer(pinn, loss, tracker)
-    trainer.train(learning_rate=0.002, max_epochs=100_000)
+    trainer.train(learning_rate=0.002)

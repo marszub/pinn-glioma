@@ -1,9 +1,7 @@
 from typing import Callable
 from Pinn import PINN
-from Tracker import Tracker
+from tracking.DefaultTracker import Tracker
 import torch
-
-from menu.PauseMenu import PauseMenu
 
 
 class Trainer:
@@ -15,23 +13,23 @@ class Trainer:
     def train(
         self,
         learning_rate: int = 0.005,
-        max_epochs: int = 1_000,
     ) -> PINN:
         optimizer = torch.optim.Adam(
             self.nn.parameters(), lr=learning_rate
         )
-        self.tracker.start(self.loss.initialCondition)
-        for _ in range(max_epochs):
+        self.tracker.start(self.loss.initialCondition, self.nn)
+        while self.tracker.isTraining():
             try:
+                self.nn.train()
                 loss: torch.Tensor = self.loss(self.nn)
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
+                self.nn.eval()
 
                 self.tracker.update(self.loss.verbose(self.nn), self.nn)
             except KeyboardInterrupt:
-                pauseMenu = PauseMenu(self.tracker)
-                pauseMenu.run()
-                if pauseMenu.shouldTerminate():
-                    break
+                self.nn.eval()
+                self.tracker.pause()
+
         self.tracker.finish(self.nn)
