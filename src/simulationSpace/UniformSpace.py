@@ -47,24 +47,22 @@ class UniformSpace(SampleSpace):
         x_domain = self.timespaceDomain.spaceDomains[0]
         y_domain = self.timespaceDomain.spaceDomains[1]
         t_domain = self.timespaceDomain.timeDomain
-        assert(self.spaceResoultion == self.timeResoultion)
-        n_points = self.spaceResoultion
         x_raw = torch.linspace(
             x_domain[0],
             x_domain[1],
-            steps=n_points,
+            steps=self.spaceResoultion,
             requires_grad=self.requiresGrad,
         )
         y_raw = torch.linspace(
             y_domain[0],
             y_domain[1],
-            steps=n_points,
+            steps=self.spaceResoultion,
             requires_grad=self.requiresGrad,
         )
         t_raw = torch.linspace(
             t_domain[0],
             t_domain[1],
-            steps=n_points,
+            steps=self.timeResoultion,
             requires_grad=self.requiresGrad,
         )
         grids = torch.meshgrid(x_raw, y_raw, t_raw, indexing="ij")

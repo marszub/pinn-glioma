@@ -60,12 +60,38 @@ class Visualizer:
         )
         plt.close()
 
-    def plotSizeOverTime(self, pinn: PINN):
+    def plotSizeOverTime(
+        self, pinn: PINN, filename: str = "tumor-size-over-time"
+    ):
         x, y, t = self.space.getInteriorPoints()
         u = pinn(x, y, t)
         uniqueT, indexes = torch.unique(t, return_inverse=True)
-        res = torch.zeros_like(uniqueT).scatter_add_(0, indexes, u)
+        sumOverTime = torch.zeros((uniqueT.size()[0], 1)).scatter_add_(0, indexes, u)
+        xSpaceSize = (
+            self.space.timespaceDomain.spaceDomains[0][1]
+            - self.space.timespaceDomain.spaceDomains[0][0]
+        )
+        xpointsPerLengthUnit = self.space.spaceResoultion / xSpaceSize
+        ySpaceSize = (
+            self.space.timespaceDomain.spaceDomains[1][1]
+            - self.space.timespaceDomain.spaceDomains[1][0]
+        )
+        ypointsPerLengthUnit = self.space.spaceResoultion / ySpaceSize
+        pointsPerSpaceUnit = ypointsPerLengthUnit * xpointsPerLengthUnit
+        intencityOverTime = sumOverTime / pointsPerSpaceUnit
 
+        uniqueT = uniqueT.detach()
+        intencityOverTime = intencityOverTime.detach()
+
+        fig, ax = plt.subplots(figsize=(8, 6), dpi=100)
+        ax.set_title("Tumor size over time")
+        ax.set_xlabel("Time [days]")
+        ax.set_ylabel("Tumor size")
+        ax.plot(uniqueT, intencityOverTime)
+        plt.savefig(
+            f"{self.saveDir}/{filename}.png", transparent=self.transparent
+        )
+        plt.close()
 
     def printLoss(self, losses):
         lossReport = f"""
@@ -80,7 +106,7 @@ class Visualizer:
 
     def animateProgress(self, pinn: PINN, fileName: str):
         frameFileNames = []
-        for i in range(self.space.timeResoultion+1):
+        for i in range(self.space.timeResoultion + 1):
             x, y, _ = self.space.getInitialPointsKeepDims()
             timeValue = (
                 self.space.timespaceDomain.timeDomain[0]

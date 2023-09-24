@@ -7,3 +7,4 @@ Therapy indeed makes difference to simulated tumor size. Animations below show g
 |No therapy|Therapy|
 |---|---|
 |![Simualtion of Giloma growth without therapy](./resources/no-therapy/animation.gif)|![Simualtion of Giloma growth with therapy](./resources/therapy/animation.gif)|
+|![Tumor size over time without therapy](./resources/no-therapy/tumor-size-over-time.png)|![Tumor size over time with therapy](./resources/therapy/tumor-size-over-time.png)|

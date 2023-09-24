@@ -16,6 +16,7 @@ class PauseMenu:
             "help",
             "mkdir",
             "resume",
+            "plotsize",
         }
 
     def run(self) -> None:
@@ -82,6 +83,12 @@ class PauseMenu:
 
     def resume(self, _):
         self.isUnpaused = True
+
+    def plotsize(self, args):
+        if len(args) > 0:
+            self.tracker.visualizer.plotSizeOverTime(self.tracker.bestApprox.cpu(), args[0])
+        else:
+            self.tracker.visualizer.plotSizeOverTime(self.tracker.bestApprox.cpu())
 
 
 class WrongCommandSyntax(Exception):
