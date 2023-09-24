@@ -1,9 +1,10 @@
 # PINN approximation of brain tumor growth and therapy
 Initial condition was given using quadratic function.
 ![Initial condition](./resources/therapy/initial_condition.png)
-Therapy factor indicates what fraction of tumor cells die per day. Chart below presents its value in over simulation tine. 
+Therapy factor indicates what fraction of tumor cells die per day. Chart below presents its value over simulation tine. 
 ![Simualtion of Giloma growth without therapy](./resources/therapy/therapy-intencity.png)
-Therapy indeed makes difference to simulated tumor size. Animations below show giloma growth without therapy and with it.
+Therapy indeed makes difference to simulated tumor size. Animations below show giloma growth without therapy and with it. 
+Next there are charts of tumor size over time calculated as finite integral in space domain of the tumor concentration function. 
 |No therapy|Therapy|
 |---|---|
 |![Simualtion of Giloma growth without therapy](./resources/no-therapy/animation.gif)|![Simualtion of Giloma growth with therapy](./resources/therapy/animation.gif)|
