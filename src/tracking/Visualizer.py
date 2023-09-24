@@ -2,6 +2,7 @@ from os import makedirs
 import sys
 from typing import Callable
 import numpy as np
+import torch
 from Pinn import PINN
 import matplotlib.pyplot as plt
 from torch import full_like, save
@@ -59,6 +60,13 @@ class Visualizer:
         )
         plt.close()
 
+    def plotSizeOverTime(self, pinn: PINN):
+        x, y, t = self.space.getInteriorPoints()
+        u = pinn(x, y, t)
+        uniqueT, indexes = torch.unique(t, return_inverse=True)
+        res = torch.zeros_like(uniqueT).scatter_add_(0, indexes, u)
+
+
     def printLoss(self, losses):
         lossReport = f"""
         Total loss: \t{losses[0]:.5f} ({losses[0]:.3E})
@@ -72,7 +80,7 @@ class Visualizer:
 
     def animateProgress(self, pinn: PINN, fileName: str):
         frameFileNames = []
-        for i in range(self.space.timeResoultion):
+        for i in range(self.space.timeResoultion+1):
             x, y, _ = self.space.getInitialPointsKeepDims()
             timeValue = (
                 self.space.timespaceDomain.timeDomain[0]
@@ -87,10 +95,10 @@ class Visualizer:
                 x,
                 timeValue,
             )
-            z = pinn(x, y, t)
+            u = pinn(x, y, t)
             frameName = self.saveDir + f"/{fileName}_{i}.png"
             fig = self.plotter.plot(
-                z,
+                u,
                 x,
                 y,
                 self.space.spaceResoultion,
@@ -121,7 +129,7 @@ class Visualizer:
                 format="GIF",
                 append_images=frames[1:],
                 save_all=True,
-                duration=1000,
+                duration=500,
                 loop=0,
             )
         except ImportError:
