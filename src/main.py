@@ -1,52 +1,43 @@
+#!/bin/python
+
 from Initializer import Initializer
 from menu.ArgsParser import ArgsParser
-from loss.DiffusionMap import DiffusionMap
-from loss.Treatment import Treatment
-from simulationSpace.RandomSpace import RandomSpace
-from simulationSpace.TimespaceDomain import TimespaceDomain
+from model.Configuration import Configuration
 import torch
 from loss.Loss import Loss
-from InitialCondition import InitialCondition
 from Traininer import Trainer
 from Weights import Weights
+from simulationSpace.RandomSpace import RandomSpace
 
 if __name__ == "__main__":
+    config = Configuration()
+
     argsParser = ArgsParser()
     argsParser.show()
-    config = argsParser.get()
-    initializer = Initializer(config)
+    args = argsParser.get()
+    initializer = Initializer(args)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(device)
 
-    timespace = TimespaceDomain(
-        spaceDomains=[(0.0, 100.0), (0.0, 100.0)],
-        timeDomain=(0.0, 100.0),
+    tracker = initializer.getTracker(timespace=config.getTimespaceDomain())
+
+    pinn = initializer.initialize(config.getNeuralNetwork()).to(device)
+
+    learnSpace = RandomSpace(
+        timespaceDomain=config.getTimespaceDomain(),
+        initialSize=35 * 35,
+        interiorSize=35 * 35 * 35,
+        boundarySize=35,
     )
-    diffusion = DiffusionMap(timespace, device)
-    treatment00 = Treatment(absorptionRate=2.0, decayRate=0.02, dose=0.00, firstDoseTime=10.0, dosesNum=3, timeBetweenDoses=30.0)
-    treatment01 = Treatment(absorptionRate=2.0, decayRate=0.02, dose=0.02, firstDoseTime=10.0, dosesNum=3, timeBetweenDoses=30.0)
-    treatment02 = Treatment(absorptionRate=2.0, decayRate=0.02, dose=0.05, firstDoseTime=50.0, dosesNum=2, timeBetweenDoses=20.0)
-
-    learnRandom = RandomSpace(
-        timespaceDomain=timespace,
-        initialSize=35*35,
-        interiorSize=35*35*35,
-        boundarySize=35
-    )
-    initialCondition = InitialCondition((60.0, 60.0), 0.4, 10)
-
-    tracker = initializer.getTracker(timespace=timespace)
-
-    pinn = initializer.getModel().to(device)
 
     weights = Weights(residual=1.0, initial=1.0, boundary=1.0)
-    
+
     loss = Loss(
-        learnRandom,
-        initialCondition,
-        diffusion,
-        treatment00,
+        learnSpace,
+        config.getInitialCondition(),
+        config.getDiffusionMap(device),
+        config.getTreatment(),
         weights,
     )
     trainer = Trainer(pinn, loss, tracker)

@@ -3,8 +3,8 @@ from Pinn import PINN
 from simulationSpace.TimespaceDomain import TimespaceDomain
 from tracking.DefaultTracker import DefaultTracker, Tracker
 from simulationSpace.UniformSpace import UniformSpace
-from tracking.Plotter3D import Plotter3D
-from tracking.PlotterColor import PlotterColor
+from plotter.Plotter3D import Plotter3D
+from plotter.PlotterColor import PlotterColor
 from tracking.SimpleTracker import SimpleTracker
 from tracking.Visualizer import Visualizer
 from torch import load, nn
@@ -47,8 +47,7 @@ class Initializer:
             startPaused=self.config.pause,
         )
 
-    def getModel(self):
-        model = PINN(layers=4, neuronsPerLayer=120, act=nn.Tanh())
+    def initialize(self, model):
         if self.config.load is not None and path.isfile(self.config.load):
             model.load_state_dict(load(self.config.load))
             model.eval()

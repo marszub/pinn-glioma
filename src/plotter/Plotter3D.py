@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 from torch import Tensor
 
-from tracking.Plotter import Plotter
+from plotter.Plotter import Plotter
 
 
 class Plotter3D(Plotter):

@@ -24,9 +24,6 @@ class Visualizer:
         self.saveDir = saveDir
         self.transparent = transparent
 
-    def saveModel(self, model):
-        save(model.cpu().state_dict(), self.saveDir + "/model")
-
     def plotIC(self, initialCondition: Callable):
         x, y, _ = self.space.getInitialPointsKeepDims()
         z = initialCondition(x, y)
