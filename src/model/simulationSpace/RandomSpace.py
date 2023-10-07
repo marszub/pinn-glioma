@@ -1,9 +1,9 @@
 import torch
-from simulationSpace.SampleSpace import SampleSpace
+from model.simulationSpace.SampleSpace import SampleSpace
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from simulationSpace.TimespaceDomain import TimespaceDomain
+    from model.simulationSpace.TimespaceDomain import TimespaceDomain
 
 class RandomSpace(SampleSpace):
     def __init__(self, timespaceDomain: "TimespaceDomain", initialSize: int, interiorSize: int, boundarySize: int):

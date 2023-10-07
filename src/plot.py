@@ -1,12 +1,8 @@
 #!/bin/python
 
-from os import path
-from torch import load
 from model.Configuration import Configuration
 from plot.ArgsParser import ArgsParser
-from plot.Plotter3D import Plotter3D
-from plot.PlotterColor import PlotterColor
-from simulationSpace.UniformSpace import UniformSpace
+from model.simulationSpace.UniformSpace import UniformSpace
 from plot.Visualizer import Visualizer
 
 if __name__ == "__main__":
@@ -16,8 +12,10 @@ if __name__ == "__main__":
     config = Configuration()
 
     if args.style == "color":
+        from plot.PlotterColor import PlotterColor
         plotter = PlotterColor(limit=args.maxU)
     if args.style == "3d":
+        from plot.Plotter3D import Plotter3D
         plotter = Plotter3D(limit=args.maxU)
 
     timeResolution = 20
@@ -35,6 +33,8 @@ if __name__ == "__main__":
     )
 
     if args.plotType in parser.modelPlotTypes:
+        from torch import load
+        from os import path
         model = config.getNeuralNetwork()
         if path.isfile(args.input):
             model.load_state_dict(load(args.input))

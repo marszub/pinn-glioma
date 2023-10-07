@@ -36,8 +36,8 @@ class ArgsParser:
         )
         self.parser.add_argument(
             "-s",
-            "--simpleOutput",
-            help="Only model and loss chart are saved at the end of training.",
+            "--silentOutput",
+            help="Don't print any output to console. (default: %(default)s)",
             action="store_true",
         )
         self.config = self.parser.parse_args()

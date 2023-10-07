@@ -4,7 +4,7 @@ from train.Traininer import Trainer
 from train.Threads import interactiveTrainingThread, trainingThread
 from train.tracking.DefaultTracker import DefaultTracker, Tracker
 from train.tracking.SharedData import SharedData
-from train.tracking.SimpleTracker import SimpleTracker
+from train.tracking.SilentTracker import SilentTracker
 from torch import load
 from train.ModelSaver import ModelSaver
 
@@ -17,8 +17,8 @@ class Initializer:
     def getTracker(self) -> Tracker:
         modelSaver = ModelSaver(self.config.output)
 
-        if self.config.simpleOutput:
-            return SimpleTracker(
+        if self.config.silentOutput:
+            return SilentTracker(
                 modelSaver,
                 epochs=self.config.epochs,
                 sharedData=self.sharedData,

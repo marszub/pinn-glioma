@@ -1,8 +1,8 @@
-from InitialCondition import InitialCondition
-from Pinn import PINN
-from loss.DiffusionMap import DiffusionMap
-from loss.Treatment import Treatment
-from simulationSpace.TimespaceDomain import TimespaceDomain
+from model.loss.InitialCondition import InitialCondition
+from model.Pinn import PINN
+from model.loss.DiffusionMap import DiffusionMap
+from model.loss.Treatment import Treatment
+from model.simulationSpace.TimespaceDomain import TimespaceDomain
 from torch import nn
 
 

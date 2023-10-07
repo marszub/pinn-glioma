@@ -1,9 +1,9 @@
 from typing import Callable
-from loss.Treatment import Treatment
-from simulationSpace.SampleSpace import SampleSpace
-from Pinn import PINN
-from Weights import Weights
-from loss.Function import *
+from model.loss.Treatment import Treatment
+from model.simulationSpace.SampleSpace import SampleSpace
+from model.Pinn import PINN
+from model.loss.Weights import Weights
+from model.loss.Function import *
 
 class Loss:
     def __init__(

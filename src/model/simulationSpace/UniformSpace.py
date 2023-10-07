@@ -1,6 +1,6 @@
 import torch
-from simulationSpace.TimespaceDomain import TimespaceDomain
-from simulationSpace.SampleSpace import SampleSpace
+from model.simulationSpace.TimespaceDomain import TimespaceDomain
+from model.simulationSpace.SampleSpace import SampleSpace
 
 class UniformSpace(SampleSpace):
     def __init__(self, timespaceDomain: TimespaceDomain, spaceResoultion: int, timeResoultion: int, requiresGrad: bool = True):

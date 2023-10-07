@@ -1,6 +1,6 @@
 import asyncio
 from typing import Callable
-from Pinn import PINN
+from model.Pinn import PINN
 from train.tracking.DefaultTracker import Tracker
 import torch
 
@@ -18,7 +18,7 @@ class Trainer:
         optimizer = torch.optim.Adam(
             self.nn.parameters(), lr=self.learningRate
         )
-        self.tracker.start(self.loss.initialCondition, self.nn)
+        self.tracker.start(self.nn)
         while self.tracker.isTraining():
             try:
                 self.nn.train()

@@ -5,10 +5,10 @@ from train.Initializer import Initializer
 from train.ArgsParser import ArgsParser
 from model.Configuration import Configuration
 import torch
-from loss.Loss import Loss
+from model.loss.Loss import Loss
 from train.Traininer import Trainer
-from Weights import Weights
-from simulationSpace.RandomSpace import RandomSpace
+from model.loss.Weights import Weights
+from model.simulationSpace.RandomSpace import RandomSpace
 
 if __name__ == "__main__":
     config = Configuration()

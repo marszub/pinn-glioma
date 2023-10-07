@@ -1,17 +1,18 @@
 from copy import deepcopy
-from typing import Callable
-from Pinn import PINN
+from model.Pinn import PINN
 from train.ModelSaver import ModelSaver
 from train.tracking.SharedData import SharedData
 
 
 class Tracker:
-    def __init__(self, modelSaver: ModelSaver, epochs: int, sharedData: SharedData):
+    def __init__(
+        self, modelSaver: ModelSaver, epochs: int, sharedData: SharedData
+    ):
         self.modelSaver = modelSaver
         self.maxEpochs = epochs
         self.sharedData = sharedData
 
-    def start(self, initialCondition: Callable, nn: PINN):
+    def start(self, nn: PINN):
         self.epoch = 0
         self.bestApprox = deepcopy(nn)
 
@@ -25,6 +26,8 @@ class Tracker:
 
     def terminate(self):
         self.sharedData.terminate = True
-    
+
     def isTraining(self):
-        return not self.sharedData.terminate and self.epoch < self.maxEpochs
+        return (
+            not self.sharedData.terminate and self.epoch < self.maxEpochs
+        )
