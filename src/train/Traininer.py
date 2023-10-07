@@ -1,21 +1,22 @@
+import asyncio
 from typing import Callable
 from Pinn import PINN
-from tracking.DefaultTracker import Tracker
+from train.tracking.DefaultTracker import Tracker
 import torch
 
 
 class Trainer:
-    def __init__(self, nn: PINN, loss: Callable, tracker: Tracker):
+    def __init__(
+        self, nn: PINN, loss: Callable, tracker: Tracker, learningRate
+    ):
         self.nn = nn
         self.loss = loss
         self.tracker = tracker
+        self.learningRate = learningRate
 
-    def train(
-        self,
-        learning_rate: int = 0.005,
-    ) -> PINN:
+    async def train(self) -> PINN:
         optimizer = torch.optim.Adam(
-            self.nn.parameters(), lr=learning_rate
+            self.nn.parameters(), lr=self.learningRate
         )
         self.tracker.start(self.loss.initialCondition, self.nn)
         while self.tracker.isTraining():
@@ -27,9 +28,7 @@ class Trainer:
                 optimizer.step()
                 self.nn.eval()
 
+                await asyncio.sleep(0)
                 self.tracker.update(self.loss.verbose(self.nn), self.nn)
             except KeyboardInterrupt:
-                self.nn.eval()
-                self.tracker.pause()
-
-        self.tracker.finish(self.nn)
+                self.tracker.terminate()

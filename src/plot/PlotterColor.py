@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 from torch import Tensor
-from plotter.Plotter import Plotter
+from plot.Plotter import Plotter
 
 
 class PlotterColor(Plotter):

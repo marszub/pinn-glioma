@@ -1,11 +1,12 @@
 #!/bin/python
 
-from Initializer import Initializer
-from menu.ArgsParser import ArgsParser
+import asyncio
+from train.Initializer import Initializer
+from train.ArgsParser import ArgsParser
 from model.Configuration import Configuration
 import torch
 from loss.Loss import Loss
-from Traininer import Trainer
+from train.Traininer import Trainer
 from Weights import Weights
 from simulationSpace.RandomSpace import RandomSpace
 
@@ -20,7 +21,7 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(device)
 
-    tracker = initializer.getTracker(timespace=config.getTimespaceDomain())
+    tracker = initializer.getTracker()
 
     pinn = initializer.initialize(config.getNeuralNetwork()).to(device)
 
@@ -40,5 +41,5 @@ if __name__ == "__main__":
         config.getTreatment(),
         weights,
     )
-    trainer = Trainer(pinn, loss, tracker)
-    trainer.train(learning_rate=0.002)
+    trainer = Trainer(pinn, loss, tracker, 0.002)
+    asyncio.run(initializer.getMainThread(trainer))

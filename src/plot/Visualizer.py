@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from torch import full_like, save
 
 from simulationSpace.UniformSpace import UniformSpace
-from plotter.Plotter import Plotter
+from plot.Plotter import Plotter
 
 
 class Visualizer:
@@ -24,7 +24,7 @@ class Visualizer:
         self.saveDir = saveDir
         self.transparent = transparent
 
-    def plotIC(self, initialCondition: Callable):
+    def plotIC(self, initialCondition: Callable, name: str):
         x, y, _ = self.space.getInitialPointsKeepDims()
         z = initialCondition(x, y)
         fig = self.plotter.plot(
@@ -37,7 +37,7 @@ class Visualizer:
         )
         plt.figure(fig)
         plt.savefig(
-            self.saveDir + "/initial_condition.png",
+            f"{self.saveDir}/{name}.png",
             transparent=self.transparent,
         )
 
@@ -86,6 +86,21 @@ class Visualizer:
         ax.plot(uniqueT, intencityOverTime)
         plt.savefig(
             f"{self.saveDir}/{filename}.png", transparent=self.transparent
+        )
+        plt.close()
+
+    def plotTreatment(self, treatment: Callable, name: str):
+        t = torch.linspace(self.space.timespaceDomain.timeDomain[0], self.space.timespaceDomain.timeDomain[1], 500)
+        f = treatment(0, 0, t)
+
+        plt.figure(figsize=(20, 6))
+        plt.plot(t, f)
+        plt.xlabel('Time in days')
+        plt.ylabel('Therapy factor')
+        plt.title(name)
+        plt.grid(True)
+        plt.savefig(
+            f"{self.saveDir}/{name}.png", transparent=self.transparent
         )
         plt.close()
 

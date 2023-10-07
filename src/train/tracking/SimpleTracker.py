@@ -1,16 +1,15 @@
 from copy import deepcopy
 from time import time
 from typing import Callable
-import numpy as np
 from Pinn import PINN
-
-from tracking.Tracker import Tracker
-from tracking.Visualizer import Visualizer
+from train.tracking import SharedData
+from train.tracking.Tracker import Tracker
+from train.ModelSaver import ModelSaver
 
 
 class SimpleTracker(Tracker):
-    def __init__(self, visualizer: Visualizer, epochs: int, isInteractive: bool, startPaused: bool):
-        super().__init__(visualizer, epochs, isInteractive, startPaused)
+    def __init__(self, modelSaver: ModelSaver, epochs: int, sharedData: SharedData):
+        super().__init__(modelSaver, epochs, sharedData)
         self.lossValues = []
         self.bestLoss = [float("inf") for _ in range(4)]
 
@@ -27,8 +26,4 @@ class SimpleTracker(Tracker):
             self.bestApprox = deepcopy(nn)
             self.bestLoss = lossValue
 
-    def finish(self, pinn: PINN):
-        self.visualizer.saveModel(self.bestApprox)
-        losses = np.array(self.lossValues)
-        self.visualizer.plotLosses(losses[:, 0], fileName="loss_total.png")
-        self.visualizer.printAverageTime((time() - self.startTime) / self.epoch)
+        super().lateUpdate()

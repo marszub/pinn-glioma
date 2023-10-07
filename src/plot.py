@@ -1,11 +1,13 @@
 #!/bin/python
 
+from os import path
+from torch import load
 from model.Configuration import Configuration
-from plotter.ArgsParser import ArgsParser
-from plotter.Plotter3D import Plotter3D
-from plotter.PlotterColor import PlotterColor
+from plot.ArgsParser import ArgsParser
+from plot.Plotter3D import Plotter3D
+from plot.PlotterColor import PlotterColor
 from simulationSpace.UniformSpace import UniformSpace
-from plotter.Visualizer import Visualizer
+from plot.Visualizer import Visualizer
 
 if __name__ == "__main__":
     parser = ArgsParser()
@@ -14,18 +16,35 @@ if __name__ == "__main__":
     config = Configuration()
 
     if args.style == "color":
-        plotter = PlotterColor()
+        plotter = PlotterColor(limit=args.maxU)
     if args.style == "3d":
-        plotter = Plotter3D()
+        plotter = Plotter3D(limit=args.maxU)
+
+    timeResolution = 20
+    if args.plotType == "sizeOverTime":
+        timeResolution = 150
 
     space = UniformSpace(
         timespaceDomain=config.getTimespaceDomain(),
         spaceResoultion=150,
-        timeResoultion=20,
+        timeResoultion=timeResolution,
         requiresGrad=False,
     )
     visualizer = Visualizer(
         plotter, space, args.output, args.plotTransparent
     )
 
-    visualizer.printLoss([1, 2, 3, 4])
+    if args.plotType in parser.modelPlotTypes:
+        model = config.getNeuralNetwork()
+        if path.isfile(args.input):
+            model.load_state_dict(load(args.input))
+            model.eval()
+
+    if args.plotType == "animation":
+        visualizer.animateProgress(model, args.name)
+    elif args.plotType == "sizeOverTime":
+        visualizer.plotSizeOverTime(model, args.name)
+    elif args.plotType == "ic":
+        visualizer.plotIC(config.getInitialCondition(), args.name)
+    elif args.plotType == "treatment":
+        visualizer.plotTreatment(config.getTreatment(), args.name)

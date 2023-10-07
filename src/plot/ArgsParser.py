@@ -3,9 +3,21 @@ from argparse import ArgumentParser
 
 class ArgsParser:
     def __init__(self):
+        self.modelPlotTypes = ["animation", "sizeOverTime"]
+        self.conditionPlotTypes = ["ic", "treatment"]
+        self.plotTypes = list(set(self.modelPlotTypes + self.conditionPlotTypes))
+        self.plotTypes.sort()
         self.parser = ArgumentParser(
             prog="plot",
             description="Program visualizing trained model, loss value during training and given conditions. ",
+        )
+        self.parser.add_argument(
+            "plotType",
+            help="Plot type. One of: %(choices)s",
+            type=str,
+            choices=self.plotTypes,
+            action="store",
+            metavar="type"
         )
         self.parser.add_argument(
             "-o",
@@ -18,9 +30,10 @@ class ArgsParser:
             "-s",
             "--style",
             default="color",
-            help="Choose style of generated plots. (default: %(default)s)",
+            help="Choose style of generated plots. One of: %(choices)s. (default: %(default)s)",
             choices=["color", "3d"],
             action="store",
+            metavar="STYLE"
         )
         self.parser.add_argument(
             "--maxU",
@@ -33,6 +46,18 @@ class ArgsParser:
             help="If set, all plots will have transparent background. (default: %(default)s)",
             action="store_true",
         )
+        self.parser.add_argument(
+            "input",
+            help="Input path.",
+            type=str,
+            action="store",
+        )
+        self.parser.add_argument(
+            "name",
+            help="Name of the plot",
+            type=str,
+            action="store",
+        )
         self.config = self.parser.parse_args()
 
     def get(self):
@@ -40,8 +65,3 @@ class ArgsParser:
 
     def show(self):
         print(self.config)
-
-
-if __name__ == "__main__":
-    menu = ArgsParser()
-    menu.show()
