@@ -5,7 +5,9 @@ class ArgsParser:
     def __init__(self):
         self.modelPlotTypes = ["animation", "sizeOverTime"]
         self.conditionPlotTypes = ["ic", "treatment"]
-        self.plotTypes = list(set(self.modelPlotTypes + self.conditionPlotTypes))
+        self.plotTypes = list(
+            set(self.modelPlotTypes + self.conditionPlotTypes)
+        )
         self.plotTypes.sort()
         self.parser = ArgumentParser(
             prog="plot",
@@ -17,7 +19,7 @@ class ArgsParser:
             type=str,
             choices=self.plotTypes,
             action="store",
-            metavar="type"
+            metavar="type",
         )
         self.parser.add_argument(
             "-o",
@@ -33,7 +35,40 @@ class ArgsParser:
             help="Choose style of generated plots. One of: %(choices)s. (default: %(default)s)",
             choices=["color", "3d"],
             action="store",
-            metavar="STYLE"
+            metavar="STYLE",
+        )
+        self.parser.add_argument(
+            "--cmap",
+            default="virdis",
+            help="Choose style of generated plots. One of: %(choices)s. (default: %(default)s)",
+            type=str,
+            choices=[
+                "viridis",
+                "plasma",
+                "inferno",
+                "magma",
+                "cividis",
+                "Greys",
+                "Purples",
+                "Blues",
+                "Greens",
+                "Oranges",
+                "Reds",
+                "YlOrBr",
+                "YlOrRd",
+                "OrRd",
+                "PuRd",
+                "RdPu",
+                "BuPu",
+                "GnBu",
+                "PuBu",
+                "YlGnBu",
+                "PuBuGn",
+                "BuGn",
+                "YlGn",
+            ],
+            action="store",
+            metavar="CMAP",
         )
         self.parser.add_argument(
             "--maxU",

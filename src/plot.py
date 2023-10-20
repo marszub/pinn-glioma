@@ -13,18 +13,20 @@ if __name__ == "__main__":
 
     if args.style == "color":
         from plot.PlotterColor import PlotterColor
-        plotter = PlotterColor(limit=args.maxU)
+        plotter = PlotterColor(limit=args.maxU, cmap=args.cmap)
     if args.style == "3d":
         from plot.Plotter3D import Plotter3D
         plotter = Plotter3D(limit=args.maxU)
 
     timeResolution = 20
+    spaceResoultion = 300
     if args.plotType == "sizeOverTime":
-        timeResolution = 150
+        timeResolution = 50
+        spaceResoultion = 150
 
     space = UniformSpace(
         timespaceDomain=config.getTimespaceDomain(),
-        spaceResoultion=150,
+        spaceResoultion=spaceResoultion,
         timeResoultion=timeResolution,
         requiresGrad=False,
     )

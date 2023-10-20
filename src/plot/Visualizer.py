@@ -57,7 +57,7 @@ class Visualizer:
         plt.close()
 
     def plotSizeOverTime(
-        self, pinn: PINN, filename: str = "tumor-size-over-time"
+        self, pinn: PINN, name: str
     ):
         x, y, t = self.space.getInteriorPoints()
         u = pinn(x, y, t)
@@ -79,13 +79,13 @@ class Visualizer:
         uniqueT = uniqueT.detach()
         intencityOverTime = intencityOverTime.detach()
 
-        fig, ax = plt.subplots(figsize=(8, 6), dpi=100)
-        ax.set_title("Tumor size over time")
+        fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
+        ax.set_title(name)
         ax.set_xlabel("Time [days]")
         ax.set_ylabel("Tumor size")
         ax.plot(uniqueT, intencityOverTime)
         plt.savefig(
-            f"{self.saveDir}/{filename}.png", transparent=self.transparent
+            f"{self.saveDir}/{''.join(letter for letter in name if letter.isalnum())}.png", transparent=self.transparent
         )
         plt.close()
 
