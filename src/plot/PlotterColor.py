@@ -33,6 +33,7 @@ class PlotterColor(Plotter):
         ax.set_title(title)
         ax.set_xlabel("x")
         ax.set_ylabel("y")
+        ax.set_aspect('equal')
         c = ax.pcolormesh(
             np.squeeze(X, axis=-1),
             np.squeeze(Y, axis=-1),

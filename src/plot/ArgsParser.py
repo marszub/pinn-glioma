@@ -39,7 +39,7 @@ class ArgsParser:
         )
         self.parser.add_argument(
             "--cmap",
-            default="virdis",
+            default="RdPu",
             help="Choose style of generated plots. One of: %(choices)s. (default: %(default)s)",
             type=str,
             choices=[

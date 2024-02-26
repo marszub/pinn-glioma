@@ -19,7 +19,7 @@ if __name__ == "__main__":
     initializer = Initializer(args)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(device)
+    print(f"Running on {device}")
 
     tracker = initializer.getTracker()
 
