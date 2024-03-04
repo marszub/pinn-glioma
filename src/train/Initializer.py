@@ -2,9 +2,8 @@ from copy import deepcopy
 from train.InteractionManager import InteractionManager
 from train.Traininer import Trainer
 from train.Threads import interactiveTrainingThread, trainingThread
-from train.tracking.DefaultTracker import DefaultTracker, Tracker
+from train.tracking.AutosaveTracker import Tracker
 from train.tracking.SharedData import SharedData
-from train.tracking.SilentTracker import SilentTracker
 from train.Saver import Saver
 import torch
 
@@ -38,12 +37,19 @@ class Initializer:
 
     def getTracker(self) -> Tracker:
         modelSaver = Saver(self.config.output)
+        if self.runConfig.interactive:
+            from train.tracking.InteractiveTracker import (
+                InteractiveTracker,
+            )
 
-        return DefaultTracker(
-            modelSaver,
-            epochs=self.runConfig.epochs,
-            sharedData=self.sharedData,
-        )
+            return InteractiveTracker(
+                modelSaver,
+                epochs=self.runConfig.epochs,
+                sharedData=self.sharedData,
+            )
+        from train.tracking.AutosaveTracker import AutosaveTracker
+
+        return AutosaveTracker(modelSaver, epochs=self.runConfig.epochs)
 
     def getTrainModel(self):
         return self.trainModel
