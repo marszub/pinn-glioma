@@ -1,21 +1,21 @@
 from copy import deepcopy
 from time import time
 from model.Pinn import PINN
-from train.ModelSaver import ModelSaver
+from train.Saver import Saver
 from train.tracking.SharedData import SharedData
 from train.tracking.Tracker import Tracker
 
 
 class DefaultTracker(Tracker):
     def __init__(
-        self, modelSaver: ModelSaver, epochs: int, sharedData: SharedData
+        self, modelSaver: Saver, epochs: int, sharedData: SharedData
     ):
         super().__init__(modelSaver, epochs, sharedData)
         self.lossValues = []
         self.bestLoss = [float("inf") for _ in range(4)]
 
-    def start(self, nn: PINN):
-        super().start(nn)
+    def start(self, lossValue: tuple, nn: PINN):
+        super().start(lossValue, nn)
         self.epochStartTime = time()
 
     def update(self, lossValue: tuple, nn: PINN):

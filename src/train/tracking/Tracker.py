@@ -1,19 +1,20 @@
 from copy import deepcopy
 from model.Pinn import PINN
-from train.ModelSaver import ModelSaver
+from train.Saver import Saver
 from train.tracking.SharedData import SharedData
 
 
 class Tracker:
     def __init__(
-        self, modelSaver: ModelSaver, epochs: int, sharedData: SharedData
+        self, modelSaver: Saver, epochs: int, sharedData: SharedData
     ):
         self.modelSaver = modelSaver
         self.maxEpochs = epochs
         self.sharedData = sharedData
 
-    def start(self, nn: PINN):
+    def start(self, lossValue: tuple, nn: PINN):
         self.epoch = 0
+        self.bestLoss = lossValue
         self.bestApprox = deepcopy(nn)
 
     def update(self, lossValue: tuple, nn: PINN):

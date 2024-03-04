@@ -1,43 +1,61 @@
-from os import path
+from copy import deepcopy
 from train.InteractionManager import InteractionManager
 from train.Traininer import Trainer
 from train.Threads import interactiveTrainingThread, trainingThread
 from train.tracking.DefaultTracker import DefaultTracker, Tracker
 from train.tracking.SharedData import SharedData
 from train.tracking.SilentTracker import SilentTracker
-from torch import load
-from train.ModelSaver import ModelSaver
+from train.Saver import Saver
+import torch
 
 
 class Initializer:
-    def __init__(self, config):
-        self.config = config
+    def __init__(self, runConfig, modelConfig, device):
+        self.device = device
+        self.runConfig = runConfig
+        self.modelConfig = modelConfig
+        self.trainModel = self.modelConfig.getNeuralNetwork().to(device)
+        self.bestModel = deepcopy(self.trainModel).to(device)
+        self.optimizer = torch.optim.Adam(
+            self.trainModel.parameters(), lr=0.002
+        )
+        if self.runConfig.load is not None:
+            self.__loadState()
         self.sharedData = SharedData()
 
-    def getTracker(self) -> Tracker:
-        modelSaver = ModelSaver(self.config.output)
+    def __loadState(self):
+        from model.Loader import loadTrainState
 
-        if self.config.silentOutput:
-            return SilentTracker(
-                modelSaver,
-                epochs=self.config.epochs,
-                sharedData=self.sharedData,
-            )
+        state = loadTrainState(
+            self.bestModel,
+            self.trainModel,
+            self.optimizer,
+            self.runConfig.load,
+        )
+        self.bestModel = state["bestModel"]
+        self.trainModel = state["trainModel"]
+        self.optimizer = state["optimizer"]
+
+    def getTracker(self) -> Tracker:
+        modelSaver = Saver(self.config.output)
 
         return DefaultTracker(
             modelSaver,
-            epochs=self.config.epochs,
+            epochs=self.runConfig.epochs,
             sharedData=self.sharedData,
         )
 
-    def initialize(self, model):
-        if self.config.load is not None and path.isfile(self.config.load):
-            model.load_state_dict(load(self.config.load))
-            model.eval()
-        return model
+    def getTrainModel(self):
+        return self.trainModel
+
+    def getBestModel(self):
+        return self.bestModel
+
+    def getOptimizer(self):
+        return self.optimizer
 
     def getMainThread(self, trainer: Trainer):
-        if self.config.interactive:
+        if self.runConfig.interactive:
             return interactiveTrainingThread(
                 trainer, InteractionManager(self.sharedData)
             )

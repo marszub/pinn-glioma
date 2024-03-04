@@ -16,14 +16,11 @@ if __name__ == "__main__":
     argsParser = ArgsParser()
     argsParser.show()
     args = argsParser.get()
-    initializer = Initializer(args)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Running on {device}")
 
-    tracker = initializer.getTracker()
-
-    pinn = initializer.initialize(config.getNeuralNetwork()).to(device)
+    initializer = Initializer(args, config, device)
 
     learnSpace = RandomSpace(
         timespaceDomain=config.getTimespaceDomain(),
@@ -41,5 +38,5 @@ if __name__ == "__main__":
         config.getTreatment(),
         weights,
     )
-    trainer = Trainer(pinn, loss, tracker, 0.002)
+    trainer = Trainer(initializer, loss)
     asyncio.run(initializer.getMainThread(trainer))
