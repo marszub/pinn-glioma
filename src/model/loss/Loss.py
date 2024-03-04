@@ -48,10 +48,10 @@ class Loss:
         x_up, y_up, t_up = up
         x_left, y_left, t_left = left
         x_right, y_right, t_right = right
-        loss_down = dfdy(pinn, x_down, y_down, t_down)
-        loss_up = dfdy(pinn, x_up, y_up, t_up)
-        loss_left = dfdx(pinn, x_left, y_left, t_left)
-        loss_right = dfdx(pinn, x_right, y_right, t_right)
+        loss_down = f(pinn, x_down, y_down, t_down)
+        loss_up = f(pinn, x_up, y_up, t_up)
+        loss_left = f(pinn, x_left, y_left, t_left)
+        loss_right = f(pinn, x_right, y_right, t_right)
 
         return (
             loss_down.pow(2).mean()
