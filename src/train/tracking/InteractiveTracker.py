@@ -29,3 +29,6 @@ class InteractiveTracker(Tracker):
             self.sharedData.save = False
             self.modelSaver.saveEvalModel(self.bestApprox)
             print("Model saved")
+
+    def isTraining(self):
+        return super().isTraining() and not self.sharedData.terminate
