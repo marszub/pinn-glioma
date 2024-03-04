@@ -34,12 +34,6 @@ class ArgsParser:
             help="Load previously trained model.",
             action="store",
         )
-        self.parser.add_argument(
-            "-s",
-            "--silentOutput",
-            help="Don't print any output to console. (default: %(default)s)",
-            action="store_true",
-        )
         self.config = self.parser.parse_args()
 
     def get(self):
