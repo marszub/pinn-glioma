@@ -11,12 +11,11 @@ class Trainer:
         self.initializer = initializer
 
     async def train(self) -> PINN:
-        with torch.no_grad():
-            bestModel = self.initializer.getBestModel()
-            tracker = self.initializer.getTracker()
-            optimizer = self.initializer.getOptimizer()
-            tracker.start(self.loss(bestModel), bestModel)
-        while self.tracker.isTraining():
+        bestModel = self.initializer.getBestModel()
+        tracker = self.initializer.getTracker()
+        optimizer = self.initializer.getOptimizer()
+        tracker.start(self.loss.verbose(bestModel), bestModel)
+        while tracker.isTraining():
             try:
                 self.nn.train()
                 loss: torch.Tensor = self.loss(self.nn)

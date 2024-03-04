@@ -13,7 +13,7 @@ class Tracker:
 
     def start(self, lossValue: tuple, nn: PINN):
         self.epoch = 0
-        self.bestLoss = lossValue
+        self.bestLoss = list(map(lambda element: element.item(), lossValue))
         self.bestApprox = deepcopy(nn)
         self.epochStartTime = time()
 

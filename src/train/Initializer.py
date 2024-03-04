@@ -36,7 +36,7 @@ class Initializer:
         self.optimizer = state["optimizer"]
 
     def getTracker(self) -> Tracker:
-        modelSaver = Saver(self.config.output)
+        modelSaver = Saver(self.runConfig.output)
         if self.runConfig.interactive:
             from train.tracking.InteractiveTracker import (
                 InteractiveTracker,

@@ -27,5 +27,5 @@ class InteractiveTracker(Tracker):
 
         if self.sharedData.save or self.epoch == self.maxEpochs:
             self.sharedData.save = False
-            self.modelSaver.saveModel(self.bestApprox)
+            self.modelSaver.saveEvalModel(self.bestApprox)
             print("Model saved")
