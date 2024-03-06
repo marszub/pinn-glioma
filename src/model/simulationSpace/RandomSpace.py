@@ -17,7 +17,7 @@ class RandomSpace(SampleSpace):
         x = self.__getX(self.initialSize)
         y = self.__getY(self.initialSize)
         tMin, _ = self.timespaceDomain.timeDomain
-        t0 = torch.full_like(x, tMin, requires_grad=True)
+        t0 = torch.full_like(x, tMin, requires_grad=True, device=self.device)
         return x, y, t0
 
     def getInteriorPoints(self):
@@ -31,12 +31,12 @@ class RandomSpace(SampleSpace):
         t = self.__getT(self.boundarySize)
 
         xMin, xMax = self.timespaceDomain.spaceDomains[0]
-        x0 = torch.full_like(x, xMin, requires_grad=True)
-        x1 = torch.full_like(x, xMax, requires_grad=True)
+        x0 = torch.full_like(x, xMin, requires_grad=True, device=self.device)
+        x1 = torch.full_like(x, xMax, requires_grad=True, device=self.device)
 
         yMin, yMax = self.timespaceDomain.spaceDomains[1]
-        y0 = torch.full_like(y, yMin, requires_grad=True)
-        y1 = torch.full_like(y, yMax, requires_grad=True)
+        y0 = torch.full_like(y, yMin, requires_grad=True, device=self.device)
+        y1 = torch.full_like(y, yMax, requires_grad=True, device=self.device)
 
         down = (x, y0, t)
         up = (x, y1, t)
