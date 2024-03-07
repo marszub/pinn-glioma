@@ -29,7 +29,7 @@ if __name__ == "__main__":
         boundarySize=35,
     )
 
-    weights = Weights(residual=1.0, initial=1.0, boundary=1.0)
+    weights = Weights(residual=1.0, initial=1.0, boundary=1.0).normalized()
 
     loss = Loss(
         learnSpace,

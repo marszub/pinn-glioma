@@ -5,8 +5,9 @@ class ArgsParser:
     def __init__(self):
         self.modelPlotTypes = ["animation", "sizeOverTime"]
         self.conditionPlotTypes = ["ic", "treatment"]
+        self.otherPlotTypes = ["loss"]
         self.plotTypes = list(
-            set(self.modelPlotTypes + self.conditionPlotTypes)
+            set(self.modelPlotTypes + self.conditionPlotTypes + self.otherPlotTypes)
         )
         self.plotTypes.sort()
         self.parser = ArgumentParser(

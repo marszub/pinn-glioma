@@ -9,7 +9,8 @@ class InteractiveTracker(Tracker):
     def __init__(
         self, modelSaver: Saver, epochs: int, sharedData: SharedData
     ):
-        super().__init__(modelSaver, epochs)
+        super().__init__(epochs)
+        self.modelSaver = modelSaver
         self.sharedData = sharedData
 
     def update(self, lossValue: tuple, nn: PINN):
@@ -28,6 +29,7 @@ class InteractiveTracker(Tracker):
         if self.sharedData.save or self.epoch == self.maxEpochs:
             self.sharedData.save = False
             self.modelSaver.saveEvalModel(self.bestApprox)
+            self.modelSaver.saveMetrics(self.lossValues)
             print("Model saved")
 
     def isTraining(self):

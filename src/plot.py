@@ -1,21 +1,22 @@
 #!/bin/python
 
-from model.Configuration import Configuration
 from plot.ArgsParser import ArgsParser
-from model.simulationSpace.UniformSpace import UniformSpace
-from plot.Visualizer import Visualizer
 
 if __name__ == "__main__":
     parser = ArgsParser()
     parser.show()
     args = parser.get()
+    from model.Configuration import Configuration
+
     config = Configuration()
 
     if args.style == "color":
         from plot.PlotterColor import PlotterColor
+
         plotter = PlotterColor(limit=args.maxU, cmap=args.cmap)
     if args.style == "3d":
         from plot.Plotter3D import Plotter3D
+
         plotter = Plotter3D(limit=args.maxU)
 
     timeResolution = 20
@@ -24,12 +25,18 @@ if __name__ == "__main__":
         timeResolution = 50
         spaceResoultion = 150
 
+    from model.simulationSpace.UniformSpace import UniformSpace
+    from model.Loader import loadMetrics
+    from plot.Visualizer import Visualizer
+    import numpy as np
+
     space = UniformSpace(
         timespaceDomain=config.getTimespaceDomain(),
         spaceResoultion=spaceResoultion,
         timeResoultion=timeResolution,
         requiresGrad=False,
     )
+
     visualizer = Visualizer(
         plotter, space, args.output, args.plotTransparent
     )
@@ -37,6 +44,7 @@ if __name__ == "__main__":
     if args.plotType in parser.modelPlotTypes:
         from torch import load
         from os import path
+
         model = config.getNeuralNetwork()
         if path.isfile(args.input):
             model.load_state_dict(load(args.input))
@@ -47,9 +55,21 @@ if __name__ == "__main__":
 
     if args.plotType == "animation":
         visualizer.animateProgress(model, args.name)
-    elif args.plotType == "sizeOverTime":
-        visualizer.plotSizeOverTime(model, args.name)
     elif args.plotType == "ic":
         visualizer.plotIC(config.getInitialCondition(), args.name)
+    elif args.plotType == "loss":
+        lossOverTime = np.array(loadMetrics(args.input), dtype=float)
+        if lossOverTime is None:
+            print("Failed to load")
+            exit()
+        visualizer.plotLosses(
+            loss_over_time=lossOverTime,
+            fileName=args.name,
+            labels=["Total", "Residual", "Initial", "Boundary"],
+        )
+    elif args.plotType == "sizeOverTime":
+        visualizer.plotSizeOverTime(model, args.name)
     elif args.plotType == "treatment":
         visualizer.plotTreatment(config.getTreatment(), args.name)
+    else:
+        print(f"Error: {args.plotType} plot type is not defiled")

@@ -9,6 +9,7 @@ class Saver:
         self.saveDir = saveDir
         self.evalModelPath = self.saveDir + "/model_best.pt"
         self.trainStatePath = self.saveDir + "/training_state.pt"
+        self.metricsPath = self.saveDir + "/loss_over_time.txt"
 
     def saveEvalModel(self, model):
         save(model.cpu().state_dict(), self.evalModelPath)
@@ -24,4 +25,5 @@ class Saver:
         )
 
     def saveMetrics(self, lossOverTime):
-        pass
+        with open(self.metricsPath, 'w') as file:
+            file.writelines(' '.join(str(j) for j in i) + '\n' for i in lossOverTime)

@@ -25,3 +25,11 @@ def loadTrainState(bestModel, model, optimizer, path):
         "optimizer": optimizer.cpu().state_dict(),
     }
     
+def loadMetrics(path):
+    if not os.path.isfile(path):
+        return None
+    lossOverTime = []
+    with open(path, 'r') as f:
+        for line in f.readlines():
+            lossOverTime.append(line.split(' '))
+    return lossOverTime

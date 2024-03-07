@@ -4,8 +4,7 @@ from model.Pinn import PINN
 from train.Saver import Saver
 
 class Tracker:
-    def __init__(self, modelSaver: Saver, epochs: int):
-        self.modelSaver = modelSaver
+    def __init__(self, epochs: int):
         self.maxEpochs = epochs
         self.lossValues = []
         self.bestLoss = [float("inf") for _ in range(4)]
