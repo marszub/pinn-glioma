@@ -41,6 +41,9 @@ if __name__ == "__main__":
         if path.isfile(args.input):
             model.load_state_dict(load(args.input))
             model.eval()
+        else:
+            print(f"File {args.input} does not exist")
+            exit()
 
     if args.plotType == "animation":
         visualizer.animateProgress(model, args.name)
