@@ -56,6 +56,28 @@ class Visualizer:
         )
         plt.close()
 
+    def plotLossMinMax(self, lossOverTime, fileName):
+        intervalsNum = 500
+        intervals = self.__splitIntervals(lossOverTime, intervalsNum)
+        intervalSize = intervals.shape[1]
+        x = np.arange(0, intervalSize * intervalsNum + 1, intervalSize)
+        avgLoss = np.sum(intervals, axis=1) / intervalSize
+        maxLoss = np.max(intervals, axis=1)
+        minLoss = np.min(intervals, axis=1)
+
+        fig, ax = plt.subplots(figsize=(8, 6), dpi=100)
+        ax.set_title("Loss function (averrage in intervals)")
+        ax.set_xlabel("Epoch")
+        ax.set_ylabel("Loss")
+        ax.plot(x, average_loss, label="Averrage loss")
+        ax.fill_between(x, minLoss, maxLoss, label="Min and Max in interval", alpha=0.2)
+        ax.set_yscale("log")
+        plt.legend()
+        plt.savefig(
+            f"{self.saveDir}/{fileName}", transparent=self.transparent
+        )
+        plt.close()
+
     def plotSizeOverTime(
         self, pinn: PINN, name: str
     ):
@@ -175,3 +197,11 @@ class Visualizer:
     def __runningAverrage(self, y, window=100):
         cumsum = np.cumsum(y, axis=0)
         return (cumsum[window:] - cumsum[:-window]) / float(window)
+
+    def __splitIntervals(self, y, intervalsNum=500):
+        intervalSize = np.floor(y.shape[0]/intervalsNum).int()
+        truncatedShape = y.shape
+        truncatedShape[0] = intervalSize * intervalsNum
+        y = np.resize(y, truncatedShape)
+        batchedShape = tuple([intervalsNum, intervalSize] + list(y.shape)[1:])
+        return np.reshape(y, batchedShape)

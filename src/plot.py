@@ -67,6 +67,13 @@ if __name__ == "__main__":
             fileName=args.name,
             labels=["Total", "Residual", "Initial", "Boundary"],
         )
+    elif args.plotType == "totalLoss":
+        lossOverTime = np.array(loadMetrics(args.input), dtype=float)
+        if lossOverTime is None:
+            print("Failed to load")
+            exit()
+        totalLoss = lossOverTime[:,:1]
+        visualizer.plotLossMinMax(totalLoss, fileName=args.name)
     elif args.plotType == "sizeOverTime":
         visualizer.plotSizeOverTime(model, args.name)
     elif args.plotType == "treatment":
