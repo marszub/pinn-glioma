@@ -1,6 +1,6 @@
 from model.loss.InitialCondition import InitialCondition
 from model.Pinn import PINN
-from model.loss.DiffusionMap import DiffusionMap
+from model.loss.LoadedDiffusionMap import LoadedDiffusionMap
 from model.loss.Treatment import Treatment
 from model.simulationSpace.TimespaceDomain import TimespaceDomain
 from torch import nn
@@ -8,11 +8,11 @@ from torch import nn
 
 class Configuration:
     def getDiffusionMap(self, device):
-        return DiffusionMap(self.getTimespaceDomain(), device)
+        return LoadedDiffusionMap(self.getTimespaceDomain(), device, "resources/diffusion_map.npy")
 
     def getTimespaceDomain(self):
         return TimespaceDomain(
-            spaceDomains=[(0.0, 100.0), (0.0, 100.0)],
+            spaceDomains=[(0.0, 50.0), (0.0, 80.0)],
             timeDomain=(0.0, 100.0),
         )
 
@@ -27,7 +27,7 @@ class Configuration:
         )
 
     def getInitialCondition(self):
-        return InitialCondition((60.0, 60.0), 0.4, 10)
+        return InitialCondition((28.0, 45.0), 0.4, 5)
 
     def getNeuralNetwork(self):
         return PINN(layers=4, neuronsPerLayer=120, act=nn.Tanh())
