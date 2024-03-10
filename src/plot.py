@@ -10,14 +10,8 @@ if __name__ == "__main__":
 
     config = Configuration()
 
-    if args.style == "color":
-        from plot.PlotterColor import PlotterColor
-
-        plotter = PlotterColor(limit=args.maxU, cmap=args.cmap)
-    if args.style == "3d":
-        from plot.Plotter3D import Plotter3D
-
-        plotter = Plotter3D(limit=args.maxU)
+    from plot.Plotter import Plotter
+    plotter = Plotter(limit=args.maxU, cmap=args.cmap)
 
     timeResolution = 20
     spaceResoultion = 300

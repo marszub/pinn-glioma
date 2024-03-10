@@ -126,17 +126,6 @@ class Visualizer:
         )
         plt.close()
 
-    def printLoss(self, losses):
-        lossReport = f"""
-        Total loss: \t{losses[0]:.5f} ({losses[0]:.3E})
-        Interior loss: \t{losses[1]:.5f} ({losses[1]:.3E})
-        Initial loss: \t{losses[2]:.5f} ({losses[2]:.3E})
-        Bondary loss: \t{losses[3]:.5f} ({losses[3]:.3E})"""
-        print(lossReport)
-
-    def printAverageTime(self, time):
-        print(f"Averrage epoch time: {time}")
-
     def animateProgress(self, pinn: PINN, fileName: str):
         frameFileNames = []
         for i in range(self.space.timeResoultion + 1):

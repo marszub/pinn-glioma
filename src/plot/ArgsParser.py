@@ -30,15 +30,6 @@ class ArgsParser:
             metavar="DIR",
         )
         self.parser.add_argument(
-            "-s",
-            "--style",
-            default="color",
-            help="Choose style of generated plots. One of: %(choices)s. (default: %(default)s)",
-            choices=["color", "3d"],
-            action="store",
-            metavar="STYLE",
-        )
-        self.parser.add_argument(
             "--cmap",
             default="RdPu",
             help="Choose style of generated plots. One of: %(choices)s. (default: %(default)s)",
