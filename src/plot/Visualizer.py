@@ -4,7 +4,7 @@ import numpy as np
 import torch
 from model.Pinn import PINN
 import matplotlib.pyplot as plt
-from torch import full_like, save
+from torch import full_like
 
 from model.simulationSpace.UniformSpace import UniformSpace
 from plot.Plotter import Plotter
