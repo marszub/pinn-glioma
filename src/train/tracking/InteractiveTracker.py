@@ -7,14 +7,14 @@ from train.tracking.Tracker import Tracker
 
 class InteractiveTracker(Tracker):
     def __init__(
-        self, modelSaver: Saver, epochs: int, sharedData: SharedData
+        self, modelSaver: Saver, epochs: int, epoch: int, lossValues: list, sharedData: SharedData
     ):
-        super().__init__(epochs)
+        super().__init__(epochs, epoch, lossValues)
         self.modelSaver = modelSaver
         self.sharedData = sharedData
 
-    def update(self, lossValue: tuple, nn: PINN):
-        super().update(lossValue, nn)
+    def update(self, lossValue: tuple, nn: PINN, optimizer):
+        super().update(lossValue, nn, optimizer)
 
         if (
             self.sharedData.unsupportedInput
@@ -28,6 +28,7 @@ class InteractiveTracker(Tracker):
 
         if self.sharedData.save or self.epoch == self.maxEpochs:
             self.sharedData.save = False
+            self.modelSaver.saveTraining(self.epoch, self.bestApprox, nn, optimizer, self.lossValues)
             self.modelSaver.saveEvalModel(self.bestApprox)
             self.modelSaver.saveMetrics(self.lossValues)
             print("Model saved")

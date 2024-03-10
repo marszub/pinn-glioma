@@ -13,6 +13,8 @@ class Initializer:
         self.device = device
         self.runConfig = runConfig
         self.modelConfig = modelConfig
+        self.epoch = 0
+        self.lossOverTime = []
         self.trainModel = self.modelConfig.getNeuralNetwork().to(device)
         self.bestModel = deepcopy(self.trainModel).to(device)
         self.optimizer = torch.optim.Adam(
@@ -31,9 +33,11 @@ class Initializer:
             self.optimizer,
             self.runConfig.load,
         )
+        self.epoch = state["epoch"]
         self.bestModel = state["bestModel"]
-        self.trainModel = state["trainModel"]
+        self.trainModel = state["model"]
         self.optimizer = state["optimizer"]
+        self.lossOverTime = state["lossOverTime"]
 
     def getTracker(self) -> Tracker:
         modelSaver = Saver(self.runConfig.output)
@@ -45,11 +49,13 @@ class Initializer:
             return InteractiveTracker(
                 modelSaver,
                 epochs=self.runConfig.epochs,
+                epoch=self.epoch,
+                lossValues=self.lossOverTime,
                 sharedData=self.sharedData,
             )
         from train.tracking.AutosaveTracker import AutosaveTracker
 
-        return AutosaveTracker(modelSaver, epochs=self.runConfig.epochs)
+        return AutosaveTracker(modelSaver, epochs=self.runConfig.epochs, epoch=self.epoch, lossValues=self.lossOverTime)
 
     def getTrainModel(self):
         return self.trainModel

@@ -25,6 +25,6 @@ class Trainer:
                 self.nn.eval()
 
                 await asyncio.sleep(0)
-                tracker.update(self.loss.verbose(self.nn), self.nn)
+                tracker.update(self.loss.verbose(self.nn), self.nn, optimizer)
             except KeyboardInterrupt:
                 tracker.terminate()

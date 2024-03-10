@@ -4,19 +4,18 @@ from model.Pinn import PINN
 from train.Saver import Saver
 
 class Tracker:
-    def __init__(self, epochs: int):
+    def __init__(self, epochs: int, epoch: int, lossValues: list):
         self.maxEpochs = epochs
-        self.lossValues = []
-        self.bestLoss = [float("inf") for _ in range(4)]
+        self.lossValues = lossValues
         self.isTerminated = False
+        self.epoch = epoch
 
     def start(self, lossValue: tuple, nn: PINN):
-        self.epoch = 0
         self.bestLoss = list(map(lambda element: element.item(), lossValue))
         self.bestApprox = deepcopy(nn)
         self.epochStartTime = time()
 
-    def update(self, lossValue: tuple, nn: PINN):
+    def update(self, lossValue: tuple, nn: PINN, optimizer):
         lossValue = list(map(lambda element: element.item(), lossValue))
         self.lossValues.append(lossValue)
         self.epoch += 1
