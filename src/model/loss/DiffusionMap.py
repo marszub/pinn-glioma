@@ -4,14 +4,11 @@ from model.simulationSpace import TimespaceDomain
 
 
 class DiffusionMap:
-    def __init__(
-        self, timespaceDomain: TimespaceDomain, device: torch.device
-    ):
+    def __init__(self, timespaceDomain: TimespaceDomain):
         self.timespaceDomain = timespaceDomain
-        self.device = device
 
     def __call__(self, x: Tensor, y: Tensor) -> Tensor:
-        res = torch.zeros(x.shape, dtype=x.dtype, device=self.device)
+        res = torch.zeros(x.shape, dtype=x.dtype, device=x.device)
         xDomainBottom, xDomainTop = self.timespaceDomain.spaceDomains[0]
         xDist = (x - xDomainBottom) / (xDomainTop - xDomainBottom) - 0.5
         yDomainBottom, yDomainTop = self.timespaceDomain.spaceDomains[1]

@@ -7,8 +7,8 @@ from torch import nn
 
 
 class Configuration:
-    def getDiffusionMap(self, device):
-        return LoadedDiffusionMap(self.getTimespaceDomain(), device, "resources/diffusion_map.npy")
+    def getDiffusionMap(self):
+        return LoadedDiffusionMap(self.getTimespaceDomain(), "resources/diffusion_map.npy")
 
     def getTimespaceDomain(self):
         return TimespaceDomain(
@@ -18,7 +18,7 @@ class Configuration:
 
     def getTreatment(self):
         return Treatment(
-            absorptionRate=2.0,
+            absorptionRate=0.5,
             decayRate=0.02,
             dose=0.05,
             firstDoseTime=50.0,
@@ -27,7 +27,7 @@ class Configuration:
         )
 
     def getInitialCondition(self):
-        return InitialCondition((28.0, 45.0), 0.4, 5)
+        return InitialCondition((28.0, 45.0), 0.4, 10)
 
     def getNeuralNetwork(self):
         return PINN(layers=4, neuronsPerLayer=120, act=nn.Tanh())
