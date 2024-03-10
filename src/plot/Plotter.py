@@ -21,8 +21,6 @@ class Plotter:
         z: Tensor,
         x: Tensor,
         y: Tensor,
-        nPointsX,
-        nPointsY,
         title,
     ):
         fig, ax = plt.subplots(figsize=self.figsize, dpi=self.dpi)
@@ -38,6 +36,45 @@ class Plotter:
             np.squeeze(Y, axis=-1),
             np.squeeze(Z, axis=-1),
             cmap=self.cmap,
+        )
+        if self.limit is not None:
+            c.set_clim(0, self.limit)
+        fig.colorbar(c, ax=ax)
+
+        return fig
+    
+    def plotWithBackground(
+        self,
+        z: Tensor,
+        backgroundZ: Tensor,
+        x: Tensor,
+        y: Tensor,
+        title,
+    ):
+        fig, ax = plt.subplots(figsize=self.figsize, dpi=self.dpi)
+        X = x.detach().cpu().numpy()
+        Y = y.detach().cpu().numpy()
+        Z = z.detach().cpu().numpy()
+        backgroundZ = backgroundZ.detach().cpu().numpy()
+        ax.set_title(title)
+        ax.set_xlabel("x")
+        ax.set_ylabel("y")
+        ax.set_aspect('equal')
+        ax.pcolormesh(
+            np.squeeze(X, axis=-1),
+            np.squeeze(Y, axis=-1),
+            np.squeeze(backgroundZ, axis=-1),
+            cmap="Greys",
+            vmin=0,
+            vmax=2*np.max(backgroundZ),
+        )
+        lim = self.limit if self.limit is not None else Z.max()
+        c = ax.pcolormesh(
+            np.squeeze(X, axis=-1),
+            np.squeeze(Y, axis=-1),
+            np.squeeze(Z, axis=-1),
+            cmap=self.cmap,
+            alpha=(Z-Z.min())/(lim-Z.min()),
         )
         if self.limit is not None:
             c.set_clim(0, self.limit)

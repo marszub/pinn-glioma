@@ -40,17 +40,21 @@ if __name__ == "__main__":
         from os import path
 
         model = config.getNeuralNetwork()
-        if path.isfile(args.input):
+        if args.input is not None and path.isfile(args.input):
             model.load_state_dict(load(args.input))
             model.eval()
         else:
             print(f"File {args.input} does not exist")
             exit()
+    
+    diffusion = None
+    if args.backgroundDiffusion:
+        diffusion = config.getDiffusionMap()
 
     if args.plotType == "animation":
-        visualizer.animateProgress(model, args.fileName)
+        visualizer.animateProgress(model, args.fileName, diffusion)
     elif args.plotType == "ic":
-        visualizer.plotIC(config.getInitialCondition(), args.title, args.fileName)
+        visualizer.plotIC(config.getInitialCondition(), args.title, args.fileName, diffusion)
     elif args.plotType == "diffusion":
         visualizer.plotIC(config.getDiffusionMap(), args.title, args.fileName)
     elif args.plotType == "loss":

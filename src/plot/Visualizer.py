@@ -24,17 +24,25 @@ class Visualizer:
         self.saveDir = saveDir
         self.transparent = transparent
 
-    def plotIC(self, initialCondition: Callable, title: str, name: str):
+    def plotIC(self, initialCondition: Callable, title: str, name: str, diffusionMap: Callable = None):
         x, y, _ = self.space.getInitialPointsKeepDims()
         z = initialCondition(x, y)
-        fig = self.plotter.plot(
-            z,
-            x,
-            y,
-            self.space.spaceResoultion,
-            self.space.spaceResoultion,
-            title,
-        )
+        if diffusionMap is None:
+            fig = self.plotter.plot(
+                z,
+                x,
+                y,
+                title,
+            )
+        else:
+            D = diffusionMap(x, y)
+            fig = self.plotter.plotWithBackground(
+                z,
+                D,
+                x,
+                y,
+                title,
+            )
         plt.figure(fig)
         plt.savefig(
             f"{self.saveDir}/{name}.png",
@@ -129,7 +137,7 @@ class Visualizer:
         )
         plt.close()
 
-    def animateProgress(self, pinn: PINN, fileName: str):
+    def animateProgress(self, pinn: PINN, fileName: str, diffusion: Callable = None):
         frameFileNames = []
         for i in range(self.space.timeResoultion + 1):
             x, y, _ = self.space.getInitialPointsKeepDims()
@@ -148,14 +156,22 @@ class Visualizer:
             )
             u = pinn(x, y, t)
             frameName = self.saveDir + f"/{fileName}_{i}.png"
-            fig = self.plotter.plot(
-                u,
-                x,
-                y,
-                self.space.spaceResoultion,
-                self.space.spaceResoultion,
-                f"PINN (t={timeValue:0,.2f})",
-            )
+            if diffusion is None:
+                fig = self.plotter.plot(
+                    u,
+                    x,
+                    y,
+                    f"PINN (t={timeValue:0,.2f})",
+                )
+            else:
+                D = diffusion(x, y)
+                fig = self.plotter.plotWithBackground(
+                    u,
+                    D,
+                    x,
+                    y,
+                    f"PINN (t={timeValue:0,.2f})",
+                )
             frameFileNames.append(frameName)
             plt.savefig(
                 frameName,

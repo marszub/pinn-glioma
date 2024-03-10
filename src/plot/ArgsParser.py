@@ -69,6 +69,11 @@ class ArgsParser:
             action="store",
         )
         self.parser.add_argument(
+            "--backgroundDiffusion",
+            help="Plot diffusion map in the background of tumor plots (default: %(default)s)",
+            action="store_true",
+        )
+        self.parser.add_argument(
             "--plotTransparent",
             help="If set, all plots will have transparent background. (default: %(default)s)",
             action="store_true",
