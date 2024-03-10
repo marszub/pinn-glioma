@@ -48,9 +48,12 @@ if __name__ == "__main__":
             exit()
 
     if args.plotType == "animation":
-        visualizer.animateProgress(model, args.name)
+        visualizer.animateProgress(model, args.fileName)
     elif args.plotType == "ic":
-        visualizer.plotIC(config.getInitialCondition(), args.name)
+        if args.addDiffusion:
+        visualizer.plotIC(config.getInitialCondition(), args.title, args.fileName)
+    elif args.plotType == "diffusion":
+        visualizer.plotIC(config.getDiffusionMap(), args.title, args.fileName)
     elif args.plotType == "loss":
         lossOverTime = np.array(loadMetrics(args.input), dtype=float)
         if lossOverTime is None:
@@ -58,7 +61,7 @@ if __name__ == "__main__":
             exit()
         visualizer.plotLosses(
             loss_over_time=lossOverTime,
-            fileName=args.name,
+            fileName=args.fileName,
             labels=["Total", "Residual", "Initial", "Boundary"],
         )
     elif args.plotType == "totalLoss":
@@ -67,10 +70,10 @@ if __name__ == "__main__":
             print("Failed to load")
             exit()
         totalLoss = lossOverTime[:,:1]
-        visualizer.plotLossMinMax(totalLoss, fileName=args.name)
+        visualizer.plotLossMinMax(totalLoss, fileName=args.fileName)
     elif args.plotType == "sizeOverTime":
-        visualizer.plotSizeOverTime(model, args.name)
+        visualizer.plotSizeOverTime(model, args.fileName)
     elif args.plotType == "treatment":
-        visualizer.plotTreatment(config.getTreatment(), args.name)
+        visualizer.plotTreatment(config.getTreatment(), args.fileName)
     else:
-        print(f"Error: {args.plotType} plot type is not defiled")
+        print(f"Error: {args.plotType} plot type is not defined")

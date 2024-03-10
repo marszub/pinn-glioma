@@ -24,7 +24,7 @@ class Visualizer:
         self.saveDir = saveDir
         self.transparent = transparent
 
-    def plotIC(self, initialCondition: Callable, name: str):
+    def plotIC(self, initialCondition: Callable, title: str, name: str):
         x, y, _ = self.space.getInitialPointsKeepDims()
         z = initialCondition(x, y)
         fig = self.plotter.plot(
@@ -33,7 +33,7 @@ class Visualizer:
             y,
             self.space.spaceResoultion,
             self.space.spaceResoultion,
-            "Initial condition - exact",
+            title,
         )
         plt.figure(fig)
         plt.savefig(
@@ -57,20 +57,23 @@ class Visualizer:
         plt.close()
 
     def plotLossMinMax(self, lossOverTime, fileName):
-        intervalsNum = 500
+        intervalsNum = 200
         intervals = self.__splitIntervals(lossOverTime, intervalsNum)
         intervalSize = intervals.shape[1]
-        x = np.arange(0, intervalSize * intervalsNum + 1, intervalSize)
-        avgLoss = np.sum(intervals, axis=1) / intervalSize
-        maxLoss = np.max(intervals, axis=1)
-        minLoss = np.min(intervals, axis=1)
+        x = np.arange(0, intervalSize * intervalsNum, intervalSize)
+        avgLoss = np.sum(intervals, axis=1).reshape(-1) / intervalSize
+        maxLoss = np.max(intervals, axis=1).reshape(-1)
+        minLoss = np.min(intervals, axis=1).reshape(-1)
+        globalMinX = np.argmin(minLoss)
+        globalMinY = np.min(minLoss)
 
         fig, ax = plt.subplots(figsize=(8, 6), dpi=100)
         ax.set_title("Loss function (averrage in intervals)")
         ax.set_xlabel("Epoch")
         ax.set_ylabel("Loss")
-        ax.plot(x, average_loss, label="Averrage loss")
+        ax.plot(x, avgLoss, label="Averrage loss")
         ax.fill_between(x, minLoss, maxLoss, label="Min and Max in interval", alpha=0.2)
+        ax.plot(globalMinX*intervalSize, globalMinY, "r.", markersize=12, label="Best fit")
         ax.set_yscale("log")
         plt.legend()
         plt.savefig(
@@ -188,8 +191,8 @@ class Visualizer:
         return (cumsum[window:] - cumsum[:-window]) / float(window)
 
     def __splitIntervals(self, y, intervalsNum=500):
-        intervalSize = np.floor(y.shape[0]/intervalsNum).int()
-        truncatedShape = y.shape
+        intervalSize = np.floor(y.shape[0]/intervalsNum).astype(int)
+        truncatedShape = list(y.shape)
         truncatedShape[0] = intervalSize * intervalsNum
         y = np.resize(y, truncatedShape)
         batchedShape = tuple([intervalsNum, intervalSize] + list(y.shape)[1:])

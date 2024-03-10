@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 class ArgsParser:
     def __init__(self):
         self.modelPlotTypes = ["animation", "sizeOverTime"]
-        self.conditionPlotTypes = ["ic", "treatment"]
+        self.conditionPlotTypes = ["ic", "treatment", "diffusion"]
         self.otherPlotTypes = ["loss", "totalLoss"]
         self.plotTypes = list(
             set(self.modelPlotTypes + self.conditionPlotTypes + self.otherPlotTypes)
@@ -74,16 +74,27 @@ class ArgsParser:
             action="store_true",
         )
         self.parser.add_argument(
-            "input",
-            help="Input path.",
+            "-i",
+            "--input",
+            help="Input path to ploted model, loss, etc. (default: %(default)s)",
             type=str,
             action="store",
         )
         self.parser.add_argument(
-            "name",
-            help="Name of the plot",
+            "-f",
+            "--fileName",
+            help="Plot file name. (default: %(default)s)",
+            default="figure",
             type=str,
             action="store",
+            metavar="NAME",
+        )
+        self.parser.add_argument(
+            "--title",
+            help="Title of the plot shown above the plot. (default: %(default)s)",
+            type=str,
+            action="store",
+            metavar="TITLE",
         )
         self.config = self.parser.parse_args()
 
