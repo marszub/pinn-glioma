@@ -50,7 +50,6 @@ if __name__ == "__main__":
     if args.plotType == "animation":
         visualizer.animateProgress(model, args.fileName)
     elif args.plotType == "ic":
-        if args.addDiffusion:
         visualizer.plotIC(config.getInitialCondition(), args.title, args.fileName)
     elif args.plotType == "diffusion":
         visualizer.plotIC(config.getDiffusionMap(), args.title, args.fileName)
