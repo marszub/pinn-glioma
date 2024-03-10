@@ -12,7 +12,7 @@ class LoadedDiffusionMap(DiffusionMap):
         loadPath: str,
     ):
         super().__init__(timespaceDomain)
-        self.D = torch.from_numpy(np.load(loadPath))
+        self.D = torch.load(loadPath)
 
     def __call__(self, x: Tensor, y: Tensor) -> Tensor:
         self.D = self.D.to(x.device)

@@ -8,7 +8,7 @@ from torch import nn
 
 class Configuration:
     def getDiffusionMap(self):
-        return LoadedDiffusionMap(self.getTimespaceDomain(), "resources/diffusion_map.npy")
+        return LoadedDiffusionMap(self.getTimespaceDomain(), "resources/diffusion_map.pt")
 
     def getTimespaceDomain(self):
         return TimespaceDomain(
