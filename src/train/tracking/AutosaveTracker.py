@@ -5,7 +5,7 @@ from train.tracking.Tracker import Tracker
 
 class AutosaveTracker(Tracker):
     def __init__(self, modelSaver: Saver, epochs: int, epoch:int, lossValues: list):
-        super().__init__(modelSaver, epochs, epoch, lossValues)
+        super().__init__(epochs, epoch, lossValues)
         self.modelSaver = modelSaver
 
     def update(self, lossValue: tuple, nn: PINN, optimizer):
