@@ -69,12 +69,13 @@ class Plotter:
             vmax=2*np.max(backgroundZ),
         )
         lim = self.limit if self.limit is not None else Z.max()
+        alpha = np.minimum((Z-Z.min())/(lim-Z.min()), 1.0)
         c = ax.pcolormesh(
             np.squeeze(X, axis=-1),
             np.squeeze(Y, axis=-1),
             np.squeeze(Z, axis=-1),
             cmap=self.cmap,
-            alpha=(Z-Z.min())/(lim-Z.min()),
+            alpha=alpha,
         )
         if self.limit is not None:
             c.set_clim(0, self.limit)
