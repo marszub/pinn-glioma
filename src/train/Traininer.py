@@ -1,6 +1,6 @@
 import asyncio
 from typing import Callable
-from model.Pinn import PINN
+from pinn.Pinn import PINN
 import torch
 
 

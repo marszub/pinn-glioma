@@ -1,7 +1,7 @@
 from torch import Tensor
 import torch
-from model.simulationSpace.TimespaceDomain import TimespaceDomain
-from model.loss.DiffusionMap import DiffusionMap
+from model.TimespaceDomain import TimespaceDomain
+from model.DiffusionMap import DiffusionMap
 import numpy as np
 
 

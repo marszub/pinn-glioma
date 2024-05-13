@@ -1,6 +1,6 @@
 from copy import deepcopy
 from time import time
-from model.Pinn import PINN
+from pinn.Pinn import PINN
 
 class Tracker:
     def __init__(self, epochs: int, epoch: int, lossValues: list):

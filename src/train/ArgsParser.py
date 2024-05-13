@@ -15,6 +15,7 @@ class ArgsParser:
             default=50_000,
             action="store",
         )
+
         self.parser.add_argument(
             "-o",
             "--output",
@@ -22,6 +23,7 @@ class ArgsParser:
             help="Path to output dir. (default: %(default)s)",
             metavar="DIR",
         )
+
         self.parser.add_argument(
             "-i",
             "--interactive",

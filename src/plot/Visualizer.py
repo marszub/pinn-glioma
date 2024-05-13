@@ -2,11 +2,11 @@ from os import makedirs
 from typing import Callable
 import numpy as np
 import torch
-from model.Pinn import PINN
+from pinn.Pinn import PINN
 import matplotlib.pyplot as plt
 from torch import full_like
 
-from model.simulationSpace.UniformSpace import UniformSpace
+from pinn.simulationSpace.UniformSpace import UniformSpace
 from plot.Plotter import Plotter
 
 

@@ -1,6 +1,7 @@
 from typing import Tuple
 from torch import Tensor, sqrt
 
+
 class InitialCondition:
     def __init__(self, origin: Tuple[float, float], h: float, r: float):
         self.origin = origin

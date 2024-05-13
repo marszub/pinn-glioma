@@ -19,8 +19,8 @@ if __name__ == "__main__":
         timeResolution = 50
         spaceResoultion = 150
 
-    from model.simulationSpace.UniformSpace import UniformSpace
-    from model.Loader import loadMetrics
+    from pinn.simulationSpace.UniformSpace import UniformSpace
+    from pinn.Loader import loadMetrics
     from plot.Visualizer import Visualizer
     import numpy as np
 

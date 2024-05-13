@@ -1,5 +1,5 @@
 import torch
-from model.Pinn import PINN
+from pinn.Pinn import PINN
 from torch import Tensor
 
 

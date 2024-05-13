@@ -1,6 +1,6 @@
 from torch import Tensor
 import torch
-from model.simulationSpace import TimespaceDomain
+from model import TimespaceDomain
 
 
 class DiffusionMap:

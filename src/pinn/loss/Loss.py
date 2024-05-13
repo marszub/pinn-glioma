@@ -1,31 +1,27 @@
-from typing import Callable
-from model.loss.Treatment import Treatment
-from model.simulationSpace.SampleSpace import SampleSpace
-from model.Pinn import PINN
-from model.loss.Weights import Weights
-from model.loss.Function import *
+from model.Experiment import Experiment
+from pinn.simulationSpace.SampleSpace import SampleSpace
+from pinn.Pinn import PINN
+from pinn.loss.Weights import Weights
+from pinn.loss.Function import f, dfdx, dfdy, dfdt
+
 
 class Loss:
     def __init__(
         self,
         space: SampleSpace,
-        initialCondition: Callable,
-        diffusion: Callable,
-        treatment: Treatment,
+        experiment: Experiment,
         weights: Weights,
     ):
         self.space = space
-        self.initialCondition = initialCondition
-        self.diffusion = diffusion
-        self.treatment = treatment
+        self.experiment = experiment
         self.weighs = weights
 
     def __residual(self, pinn: PINN):
         x, y, t = self.space.getInteriorPoints()
-        rho = 0.025
+        rho = self.experiment.rho
 
-        D = self.diffusion(x, y)
-        R = self.treatment(x, y, t)
+        D = self.experiment.diffusion(x, y)
+        R = self.experiment.treatment(x, y, t)
         u = f(pinn, x, y, t)
         loss = (
             dfdt(pinn, x, y, t)
@@ -38,7 +34,7 @@ class Loss:
 
     def __initial(self, pinn: PINN):
         x, y, t = self.space.getInitialPoints()
-        pinn_init = self.initialCondition(x, y)
+        pinn_init = self.experiment.ic(x, y)
         loss = f(pinn, x, y, t) - pinn_init
         return loss.pow(2).mean()
 

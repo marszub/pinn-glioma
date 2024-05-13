@@ -1,6 +1,6 @@
 import torch
 
-from model.simulationSpace.TimespaceDomain import TimespaceDomain
+from model.TimespaceDomain import TimespaceDomain
 
 class SampleSpace:
     def __init__(self, timespaceDomain: TimespaceDomain):

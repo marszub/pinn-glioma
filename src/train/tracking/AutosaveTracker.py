@@ -1,4 +1,4 @@
-from model.Pinn import PINN
+from pinn.Pinn import PINN
 from train.Saver import Saver
 from train.tracking.Tracker import Tracker
 

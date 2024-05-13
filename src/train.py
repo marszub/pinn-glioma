@@ -3,15 +3,16 @@
 import asyncio
 from train.Initializer import Initializer
 from train.ArgsParser import ArgsParser
-from model.Configuration import Configuration
+from pinn.PinnConfig import PinnConfig
 import torch
-from model.loss.Loss import Loss
+from pinn.loss.Loss import Loss
+from model.Experiment import Experiment
 from train.Traininer import Trainer
-from model.loss.Weights import Weights
-from model.simulationSpace.RandomSpace import RandomSpace
+from pinn.simulationSpace.RandomSpace import RandomSpace
 
 if __name__ == "__main__":
-    config = Configuration()
+    config = PinnConfig()
+    experiment = Experiment()
 
     argsParser = ArgsParser()
     argsParser.show()
@@ -23,20 +24,16 @@ if __name__ == "__main__":
     initializer = Initializer(args, config, device)
 
     learnSpace = RandomSpace(
-        timespaceDomain=config.getTimespaceDomain(),
+        timespaceDomain=experiment.timespaceDomain,
         initialSize=35 * 35,
         interiorSize=35 * 35 * 35,
         boundarySize=35,
     )
 
-    weights = Weights(residual=2.0, initial=1.0, boundary=1.0).normalized()
-
     loss = Loss(
         learnSpace,
-        config.getInitialCondition(),
-        config.getDiffusionMap(),
-        config.getTreatment(),
-        weights,
+        experiment,
+        config.weights,
     )
     trainer = Trainer(initializer, loss)
     asyncio.run(initializer.getMainThread(trainer))

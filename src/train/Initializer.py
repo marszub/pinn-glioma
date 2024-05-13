@@ -9,13 +9,12 @@ import torch
 
 
 class Initializer:
-    def __init__(self, runConfig, modelConfig, device):
+    def __init__(self, runConfig, pinnConfig, device):
         self.device = device
         self.runConfig = runConfig
-        self.modelConfig = modelConfig
         self.epoch = 0
         self.lossOverTime = []
-        self.trainModel = self.modelConfig.getNeuralNetwork().to(device)
+        self.trainModel = pinnConfig.getNeuralNetwork().to(device)
         self.bestModel = deepcopy(self.trainModel).to(device)
         self.optimizer = torch.optim.Adam(
             self.trainModel.parameters(), lr=0.002
@@ -25,7 +24,7 @@ class Initializer:
         self.sharedData = SharedData()
 
     def __loadState(self):
-        from model.Loader import loadTrainState
+        from pinn.Loader import loadTrainState
 
         state = loadTrainState(
             self.bestModel,
