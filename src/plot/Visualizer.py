@@ -4,7 +4,7 @@ import numpy as np
 import torch
 from pinn.Pinn import PINN
 import matplotlib.pyplot as plt
-from torch import full_like
+from torch import full_like, Tensor
 
 from pinn.simulationSpace.UniformSpace import UniformSpace
 from plot.Plotter import Plotter
@@ -90,28 +90,8 @@ class Visualizer:
         plt.close()
 
     def plotSizeOverTime(
-        self, pinn: PINN, name: str
+        self, times: Tensor, sizes: Tensor, name: str
     ):
-        x, y, t = self.space.getInteriorPoints()
-        u = pinn(x, y, t)
-        uniqueT, indexes = torch.unique(t, return_inverse=True)
-        sumOverTime = torch.zeros((uniqueT.size()[0], 1)).scatter_add_(0, indexes, u)
-        xSpaceSize = (
-            self.space.timespaceDomain.spaceDomains[0][1]
-            - self.space.timespaceDomain.spaceDomains[0][0]
-        )
-        xpointsPerLengthUnit = self.space.spaceResoultion / xSpaceSize
-        ySpaceSize = (
-            self.space.timespaceDomain.spaceDomains[1][1]
-            - self.space.timespaceDomain.spaceDomains[1][0]
-        )
-        ypointsPerLengthUnit = self.space.spaceResoultion / ySpaceSize
-        pointsPerSpaceUnit = ypointsPerLengthUnit * xpointsPerLengthUnit
-        intencityOverTime = sumOverTime / pointsPerSpaceUnit
-
-        uniqueT = uniqueT.detach()
-        intencityOverTime = intencityOverTime.detach()
-
         fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
         ax.set_title(name)
         ax.set_xlabel("Time [days]")
@@ -137,51 +117,40 @@ class Visualizer:
         )
         plt.close()
 
-    def animateProgress(self, pinn: PINN, fileName: str, diffusion: Callable = None):
+    def animateProgress(self, data_provider: DataProvider, fileName: str, diffusion: Callable = None):
         frameFileNames = []
-        for i in range(self.space.timeResoultion + 1):
-            x, y, _ = self.space.getInitialPointsKeepDims()
-            timeValue = (
-                self.space.timespaceDomain.timeDomain[0]
-                + i
-                * (
-                    self.space.timespaceDomain.timeDomain[1]
-                    - self.space.timespaceDomain.timeDomain[0]
+        i = 0
+        data_provider.for_each_frame(
+            lambda t, u:
+                frameName = self.saveDir + f"/{fileName}_{i}.png"
+                if diffusion is None:
+                    fig = self.plotter.plot(
+                        u,
+                        x,
+                        y,
+                        f"PINN (t={t:4.2f})",
+                    )
+                else:
+                    D = diffusion(x, y)
+                    fig = self.plotter.plotWithBackground(
+                        u,
+                        D,
+                        x,
+                        y,
+                        f"PINN (t={t:0,.2f})",
+                    )
+                frameFileNames.append(frameName)
+                plt.savefig(
+                    frameName,
+                    transparent=self.transparent,
+                    facecolor="white",
                 )
-                / self.space.timeResoultion
-            )
-            t = full_like(
-                x,
-                timeValue,
-            )
-            u = pinn(x, y, t)
-            frameName = self.saveDir + f"/{fileName}_{i}.png"
-            if diffusion is None:
-                fig = self.plotter.plot(
-                    u,
-                    x,
-                    y,
-                    f"PINN (t={timeValue:0,.2f})",
-                )
-            else:
-                D = diffusion(x, y)
-                fig = self.plotter.plotWithBackground(
-                    u,
-                    D,
-                    x,
-                    y,
-                    f"PINN (t={timeValue:0,.2f})",
-                )
-            frameFileNames.append(frameName)
-            plt.savefig(
-                frameName,
-                transparent=self.transparent,
-                facecolor="white",
-            )
-            plt.close()
-            self.__makeGif(
-                frameFileNames=frameFileNames, fileName=fileName
-            )
+                plt.close()
+                i += 1
+        )
+        self.__makeGif(
+            frameFileNames=frameFileNames, fileName=fileName
+        )
 
     def __makeGif(self, frameFileNames, fileName):
         try:

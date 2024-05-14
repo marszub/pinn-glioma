@@ -36,25 +36,29 @@ if __name__ == "__main__":
     )
 
     if args.plotType in parser.modelPlotTypes:
-        from torch import load
         from os import path
 
-        model = config.getNeuralNetwork()
-        if args.input is not None and path.isfile(args.input):
-            model.load_state_dict(load(args.input))
-            model.eval()
+        if args.input is None:
+            raise ArgumentExcepton(f"Plotting {args.plotType} requires input to be speified")
+        if path.isfile(args.input):
+            from plot.PinnEvaluator import PinnEvaluator
+            data_provider = PinnEvaluator(args.input, space, config)
+        elif path.isdir(args.input):
+            from plot.SimulationLoader import SimulationLoader
+            data_provider = SimulationLoader(args.input, config.getTimespaceDomain())
         else:
             print(f"File {args.input} does not exist")
             exit()
-    
+
     diffusion = None
     if args.backgroundDiffusion:
         diffusion = config.getDiffusionMap()
 
     if args.plotType == "animation":
-        visualizer.animateProgress(model, args.fileName, diffusion)
+        visualizer.animateProgress(data_provider, args.fileName, diffusion)
     elif args.plotType == "ic":
-        visualizer.plotIC(config.getInitialCondition(), args.title, args.fileName, diffusion)
+        visualizer.plotIC(config.getInitialCondition(),
+                          args.title, args.fileName, diffusion)
     elif args.plotType == "diffusion":
         visualizer.plotIC(config.getDiffusionMap(), args.title, args.fileName)
     elif args.plotType == "loss":
@@ -72,10 +76,11 @@ if __name__ == "__main__":
         if lossOverTime is None:
             print("Failed to load")
             exit()
-        totalLoss = lossOverTime[:,:1]
+        totalLoss = lossOverTime[:, :1]
         visualizer.plotLossMinMax(totalLoss, fileName=args.fileName)
     elif args.plotType == "sizeOverTime":
-        visualizer.plotSizeOverTime(model, args.fileName)
+        times, sizes = data_provider.get_size_over_time()
+        visualizer.plotSizeOverTime(times, sizes, args.fileName)
     elif args.plotType == "treatment":
         visualizer.plotTreatment(config.getTreatment(), args.fileName)
     else:

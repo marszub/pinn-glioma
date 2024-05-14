@@ -7,12 +7,15 @@ class ArgsParser:
         self.conditionPlotTypes = ["ic", "treatment", "diffusion"]
         self.otherPlotTypes = ["loss", "totalLoss"]
         self.plotTypes = list(
-            set(self.modelPlotTypes + self.conditionPlotTypes + self.otherPlotTypes)
+            set(self.modelPlotTypes +
+                self.conditionPlotTypes +
+                self.otherPlotTypes)
         )
         self.plotTypes.sort()
         self.parser = ArgumentParser(
             prog="plot",
-            description="Program visualizing trained model, loss value during training and given conditions. ",
+            description="Program visualizing trained model, " +
+            "loss value during training and given conditions. ",
         )
         self.parser.add_argument(
             "plotType",
@@ -26,13 +29,15 @@ class ArgsParser:
             "-o",
             "--output",
             default="tmp",
-            help="Path to output dir where plots are saved. (default: %(default)s)",
+            help="Path to output dir where plots are saved. " +
+            "(default: %(default)s)",
             metavar="DIR",
         )
         self.parser.add_argument(
             "--cmap",
             default="RdPu",
-            help="Choose style of generated plots. One of: %(choices)s. (default: %(default)s)",
+            help="Choose style of generated plots. One of: %(choices)s. " +
+            "(default: %(default)s)",
             type=str,
             choices=[
                 "viridis",
@@ -78,10 +83,14 @@ class ArgsParser:
             help="If set, all plots will have transparent background. (default: %(default)s)",
             action="store_true",
         )
+        exclusive = self.parser.add_mutually_exclusive_group()
         self.parser.add_argument(
             "-i",
             "--input",
-            help="Input path to ploted model, loss, etc. (default: %(default)s)",
+            help="Input path to ploted model or simulation. " +
+            "If path is file then plotting NN is assumed. " +
+            "If path is directory, plotting simulation is assumed. " +
+            "(default: %(default)s)",
             type=str,
             action="store",
         )
