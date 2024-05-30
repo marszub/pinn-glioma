@@ -6,9 +6,9 @@ if __name__ == "__main__":
     parser = ArgsParser()
     parser.show()
     args = parser.get()
-    from model.Configuration import Configuration
+    from model.Experiment import Experiment
 
-    config = Configuration()
+    experiment = Experiment()
 
     from plot.Plotter import Plotter
     plotter = Plotter(limit=args.maxU, cmap=args.cmap)
@@ -25,7 +25,7 @@ if __name__ == "__main__":
     import numpy as np
 
     space = UniformSpace(
-        timespaceDomain=config.getTimespaceDomain(),
+        timespaceDomain=experiment.timespaceDomain,
         spaceResoultion=spaceResoultion,
         timeResoultion=timeResolution,
         requiresGrad=False,
@@ -39,28 +39,33 @@ if __name__ == "__main__":
         from os import path
 
         if args.input is None:
-            raise ArgumentExcepton(f"Plotting {args.plotType} requires input to be speified")
+            raise ValueError(
+                f"Plotting {args.plotType} requires input to be speified")
         if path.isfile(args.input):
             from plot.PinnEvaluator import PinnEvaluator
+            from pinn.PinnConfig import PinnConfig
+            config = PinnConfig()
             data_provider = PinnEvaluator(args.input, space, config)
         elif path.isdir(args.input):
             from plot.SimulationLoader import SimulationLoader
-            data_provider = SimulationLoader(args.input, config.getTimespaceDomain())
+            data_provider = SimulationLoader(
+                args.input, experiment.timespaceDomain)
         else:
             print(f"File {args.input} does not exist")
             exit()
 
     diffusion = None
     if args.backgroundDiffusion:
-        diffusion = config.getDiffusionMap()
+        diffusion = experiment.getDiffusionMap()
 
     if args.plotType == "animation":
         visualizer.animateProgress(data_provider, args.fileName, diffusion)
     elif args.plotType == "ic":
-        visualizer.plotIC(config.getInitialCondition(),
+        visualizer.plotIC(experiment.getInitialCondition(),
                           args.title, args.fileName, diffusion)
     elif args.plotType == "diffusion":
-        visualizer.plotIC(config.getDiffusionMap(), args.title, args.fileName)
+        visualizer.plotIC(experiment.getDiffusionMap(),
+                          args.title, args.fileName)
     elif args.plotType == "loss":
         lossOverTime = np.array(loadMetrics(args.input), dtype=float)
         if lossOverTime is None:
@@ -80,8 +85,8 @@ if __name__ == "__main__":
         visualizer.plotLossMinMax(totalLoss, fileName=args.fileName)
     elif args.plotType == "sizeOverTime":
         times, sizes = data_provider.get_size_over_time()
-        visualizer.plotSizeOverTime(times, sizes, args.fileName)
+        visualizer.plotSizeOverTime(times, sizes, args.fileName, args.title)
     elif args.plotType == "treatment":
-        visualizer.plotTreatment(config.getTreatment(), args.fileName)
+        visualizer.plotTreatment(experiment.getTreatment(), args.fileName)
     else:
         print(f"Error: {args.plotType} plot type is not defined")

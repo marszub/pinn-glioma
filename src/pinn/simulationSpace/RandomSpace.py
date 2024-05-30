@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from model.TimespaceDomain import TimespaceDomain
 
+
 class RandomSpace(SampleSpace):
     def __init__(self, timespaceDomain: "TimespaceDomain", initialSize: int, interiorSize: int, boundarySize: int):
         super().__init__(timespaceDomain)
@@ -50,15 +51,14 @@ class RandomSpace(SampleSpace):
         vec = (maxVal - minVal) * vec + minVal
         vec.requires_grad = True
         return vec
-    
+
     def __getX(self, n: int):
         xMin, xMax = self.timespaceDomain.spaceDomains[0]
         return self.__getVector(n, xMin, xMax)
-    
+
     def __getY(self, n: int):
         yMin, yMax = self.timespaceDomain.spaceDomains[1]
         return self.__getVector(n, yMin, yMax)
-    
-    def __getT(self, n: int):
-        tMin, tMax = self.timespaceDomain.timeDomain
-        return self.__getVector(n, tMin, tMax)
+
+    def __getT(self, n: int) -> torch.Tensor:
+        raise NotImplementedError("Use of abstract method")

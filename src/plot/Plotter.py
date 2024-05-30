@@ -31,18 +31,13 @@ class Plotter:
         ax.set_xlabel("x")
         ax.set_ylabel("y")
         ax.set_aspect('equal')
-        c = ax.pcolormesh(
-            np.squeeze(X, axis=-1),
-            np.squeeze(Y, axis=-1),
-            np.squeeze(Z, axis=-1),
-            cmap=self.cmap,
-        )
+        c = ax.pcolormesh(X, Y, Z, cmap=self.cmap)
         if self.limit is not None:
             c.set_clim(0, self.limit)
         fig.colorbar(c, ax=ax)
 
         return fig
-    
+
     def plotWithBackground(
         self,
         z: Tensor,

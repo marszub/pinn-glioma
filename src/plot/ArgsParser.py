@@ -83,7 +83,6 @@ class ArgsParser:
             help="If set, all plots will have transparent background. (default: %(default)s)",
             action="store_true",
         )
-        exclusive = self.parser.add_mutually_exclusive_group()
         self.parser.add_argument(
             "-i",
             "--input",

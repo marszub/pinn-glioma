@@ -3,11 +3,12 @@
 from model.Experiment import Experiment
 from simulate.ArgsParser import ArgsParser
 from simulate.Initializer import Initializer
+import torch
 
 
 if __name__ == "__main__":
     argsParser = ArgsParser()
-    argsParser .show()
+    argsParser.show()
     args = argsParser.get()
     experiment = Experiment()
     initializer = Initializer(args, experiment)
@@ -21,7 +22,7 @@ if __name__ == "__main__":
     dt = initializer.get_dt()
     D = experiment.diffusion(x, y)
 
-    saver.first_save(u, 0)
+    saver.first_save(u, torch.tensor(0.0))
     for t in initializer.get_iterator():
         R = experiment.treatment(x, y, t)
 
@@ -33,7 +34,7 @@ if __name__ == "__main__":
 
         rhs = D * dudx2 + D * dudy2 + rho * uf * (1 - uf) - R * uf
 
-        uf = uf + rhs * dt
+        u[1:-1, 1:-1] = uf + rhs * dt
 
         saver.mid_save(u, t)
     saver.last_save(u, t)

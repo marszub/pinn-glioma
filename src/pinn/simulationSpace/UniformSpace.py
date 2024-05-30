@@ -2,19 +2,22 @@ import torch
 from model.TimespaceDomain import TimespaceDomain
 from pinn.simulationSpace.SampleSpace import SampleSpace
 
+
 class UniformSpace(SampleSpace):
     def __init__(self, timespaceDomain: TimespaceDomain, spaceResoultion: int, timeResoultion: int, requiresGrad: bool = True):
         super().__init__(timespaceDomain)
         self.spaceResoultion = spaceResoultion
         self.timeResoultion = timeResoultion
         self.requiresGrad = requiresGrad
-    
+
     def __getInitialPointsNoGrad(self):
         x_domain = self.timespaceDomain.spaceDomains[0]
         y_domain = self.timespaceDomain.spaceDomains[1]
         t_domain = self.timespaceDomain.timeDomain
-        x_linspace = torch.linspace(x_domain[0], x_domain[1], self.spaceResoultion)
-        y_linspace = torch.linspace(y_domain[0], y_domain[1], self.spaceResoultion)
+        x_linspace = torch.linspace(
+            x_domain[0], x_domain[1], self.spaceResoultion)
+        y_linspace = torch.linspace(
+            y_domain[0], y_domain[1], self.spaceResoultion)
         x_grid, y_grid = torch.meshgrid(x_linspace, y_linspace, indexing="ij")
         x_grid = x_grid.unsqueeze(dim=-1).to(self.device)
         y_grid = y_grid.unsqueeze(dim=-1).to(self.device)
@@ -29,7 +32,6 @@ class UniformSpace(SampleSpace):
         t0.requires_grad = self.requiresGrad
         return (x_grid, y_grid, t0)
 
-
     def getInitialPoints(self):
         """Generates tensor of points convering initial condition"""
         x_grid, y_grid, t0 = self.__getInitialPointsNoGrad()
@@ -40,7 +42,6 @@ class UniformSpace(SampleSpace):
         y_grid.requires_grad = self.requiresGrad
         t0.requires_grad = self.requiresGrad
         return (x_grid, y_grid, t0)
-        
 
     def getInteriorPointsKeepDims(self):
         """Keeps 2D"""
@@ -71,7 +72,7 @@ class UniformSpace(SampleSpace):
         y = grids[1].to(self.device)
         t = grids[2].to(self.device)
         return x, y, t
-    
+
     def getInteriorPoints(self):
         """Generates tensor of points convering interior of simulation"""
         x, y, t = self.getInteriorPointsKeepDims()
@@ -92,7 +93,7 @@ class UniformSpace(SampleSpace):
         x_domain = self.timespaceDomain.spaceDomains[0]
         y_domain = self.timespaceDomain.spaceDomains[1]
         t_domain = self.timespaceDomain.timeDomain
-        assert(self.spaceResoultion == self.timeResoultion)
+        assert (self.spaceResoultion == self.timeResoultion)
         n_points = self.spaceResoultion
         x_linspace = torch.linspace(x_domain[0], x_domain[1], n_points)
         y_linspace = torch.linspace(y_domain[0], y_domain[1], n_points)
@@ -108,10 +109,14 @@ class UniformSpace(SampleSpace):
         t_grid = t_grid.reshape(-1, 1).to(self.device)
         t_grid.requires_grad = self.requiresGrad
 
-        x0 = torch.full_like(t_grid, x_domain[0], requires_grad=self.requiresGrad)
-        x1 = torch.full_like(t_grid, x_domain[1], requires_grad=self.requiresGrad)
-        y0 = torch.full_like(t_grid, y_domain[0], requires_grad=self.requiresGrad)
-        y1 = torch.full_like(t_grid, y_domain[1], requires_grad=self.requiresGrad)
+        x0 = torch.full_like(
+            t_grid, x_domain[0], requires_grad=self.requiresGrad)
+        x1 = torch.full_like(
+            t_grid, x_domain[1], requires_grad=self.requiresGrad)
+        y0 = torch.full_like(
+            t_grid, y_domain[0], requires_grad=self.requiresGrad)
+        y1 = torch.full_like(
+            t_grid, y_domain[1], requires_grad=self.requiresGrad)
 
         down = (x_grid, y0, t_grid)
         up = (x_grid, y1, t_grid)

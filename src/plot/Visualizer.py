@@ -2,9 +2,10 @@ from os import makedirs
 from typing import Callable
 import numpy as np
 import torch
-from pinn.Pinn import PINN
 import matplotlib.pyplot as plt
-from torch import full_like, Tensor
+from torch import Tensor
+from plot.DataProvider import DataProvider
+from model.TimespaceDomain import TimespaceDomain
 
 from pinn.simulationSpace.UniformSpace import UniformSpace
 from plot.Plotter import Plotter
@@ -24,7 +25,13 @@ class Visualizer:
         self.saveDir = saveDir
         self.transparent = transparent
 
-    def plotIC(self, initialCondition: Callable, title: str, name: str, diffusionMap: Callable = None):
+    def plotIC(
+        self,
+        initialCondition: Callable,
+        title: str,
+        name: str,
+        diffusionMap: Callable = None
+    ):
         x, y, _ = self.space.getInitialPointsKeepDims()
         z = initialCondition(x, y)
         if diffusionMap is None:
@@ -80,8 +87,10 @@ class Visualizer:
         ax.set_xlabel("Epoch")
         ax.set_ylabel("Loss")
         ax.plot(x, avgLoss, label="Averrage loss")
-        ax.fill_between(x, minLoss, maxLoss, label="Min and Max in interval", alpha=0.2)
-        ax.plot(globalMinX*intervalSize, globalMinY, "r.", markersize=12, label="Best fit")
+        ax.fill_between(x, minLoss, maxLoss,
+                        label="Min and Max in interval", alpha=0.2)
+        ax.plot(globalMinX*intervalSize, globalMinY,
+                "r.", markersize=12, label="Best fit")
         ax.set_yscale("log")
         plt.legend()
         plt.savefig(
@@ -90,20 +99,25 @@ class Visualizer:
         plt.close()
 
     def plotSizeOverTime(
-        self, times: Tensor, sizes: Tensor, name: str
+        self, times: Tensor, sizes: Tensor, filename: str, title: str
     ):
         fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
-        ax.set_title(name)
+        ax.set_title(title)
         ax.set_xlabel("Time [days]")
         ax.set_ylabel("Tumor size")
-        ax.plot(uniqueT, intencityOverTime)
+        ax.plot(times, sizes)
         plt.savefig(
-            f"{self.saveDir}/{''.join(letter for letter in name if letter.isalnum())}.png", transparent=self.transparent
+            f"{self.saveDir}/{''.join(letter for letter in filename if letter.isalnum())}.png",
+            transparent=self.transparent
         )
         plt.close()
 
     def plotTreatment(self, treatment: Callable, name: str):
-        t = torch.linspace(self.space.timespaceDomain.timeDomain[0], self.space.timespaceDomain.timeDomain[1], 500)
+        t = torch.linspace(
+            self.space.timespaceDomain.timeDomain[0],
+            self.space.timespaceDomain.timeDomain[1],
+            500
+        )
         f = treatment(0, 0, t)
 
         plt.figure(figsize=(20, 6))
@@ -117,39 +131,73 @@ class Visualizer:
         )
         plt.close()
 
-    def animateProgress(self, data_provider: DataProvider, fileName: str, diffusion: Callable = None):
-        frameFileNames = []
-        i = 0
-        data_provider.for_each_frame(
-            lambda t, u:
-                frameName = self.saveDir + f"/{fileName}_{i}.png"
-                if diffusion is None:
-                    fig = self.plotter.plot(
+    def animateProgress(
+        self,
+        data_provider: DataProvider,
+        fileName: str,
+        diffusion: Callable = None
+    ):
+        class Iteration:
+            def __init__(
+                self,
+                save_dir: str,
+                plotter: Plotter,
+                transparent: bool,
+                space: TimespaceDomain,
+                diffusion: Callable
+            ):
+                self.save_dir = save_dir
+                self.plotter = plotter
+                self.transparent = transparent
+                self.space = space
+                self.diffusion = diffusion
+                self.i = 0
+                self.frame_file_names = []
+
+            def __call__(self, t, u):
+                assert u.shape[0] == u.shape[1]
+                spatial_resolution = u.shape[0]
+                frameName = self.save_dir + f"/{fileName}_{self.i}.png"
+                space = UniformSpace(self.space, spatial_resolution, 0)
+                x, y, _ = space.getInitialPointsKeepDims()
+                x = x.squeeze(axis=-1)
+                y = y.squeeze(axis=-1)
+                if self.diffusion is None:
+                    _ = self.plotter.plot(
                         u,
                         x,
                         y,
                         f"PINN (t={t:4.2f})",
                     )
                 else:
-                    D = diffusion(x, y)
-                    fig = self.plotter.plotWithBackground(
+                    D = self.diffusion(x, y)
+                    _ = self.plotter.plotWithBackground(
                         u,
                         D,
                         x,
                         y,
                         f"PINN (t={t:0,.2f})",
                     )
-                frameFileNames.append(frameName)
+                self.frame_file_names.append(frameName)
                 plt.savefig(
                     frameName,
                     transparent=self.transparent,
                     facecolor="white",
                 )
                 plt.close()
-                i += 1
+                self.i += 1
+
+        iteration = Iteration(
+            self.saveDir,
+            self.plotter,
+            self.transparent,
+            data_provider.timespace_domain,
+            diffusion
         )
+
+        data_provider.for_each_frame(iteration)
         self.__makeGif(
-            frameFileNames=frameFileNames, fileName=fileName
+            frameFileNames=iteration.frame_file_names, fileName=fileName
         )
 
     def __makeGif(self, frameFileNames, fileName):
