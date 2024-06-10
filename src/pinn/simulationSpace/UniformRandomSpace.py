@@ -3,6 +3,6 @@ from pinn.simulationSpace.RandomSpace import RandomSpace
 
 
 class UniformRandomSpace(RandomSpace):
-    def __getT(self, n: int) -> torch.Tensor:
+    def getT(self, n: int) -> torch.Tensor:
         tMin, tMax = self.timespaceDomain.timeDomain
         return self.__getVector(n, tMin, tMax)

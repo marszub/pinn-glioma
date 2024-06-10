@@ -23,12 +23,13 @@ class InteractiveTracker(Tracker):
             print("s      save model")
             print("e      exit with saving")
             print("ctrl+c exit without saving")
-        
+
         self.sharedData.unsupportedInput = False
 
         if self.sharedData.save or self.epoch == self.maxEpochs:
             self.sharedData.save = False
-            self.modelSaver.saveTraining(self.epoch, self.bestApprox, nn, optimizer, self.lossValues)
+            self.modelSaver.saveTraining(
+                self.epoch, self.bestApprox, nn, optimizer, self.lossValues)
             self.modelSaver.saveEvalModel(self.bestApprox)
             self.modelSaver.saveMetrics(self.lossValues)
             print("Model saved")

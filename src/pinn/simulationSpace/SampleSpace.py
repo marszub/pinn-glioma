@@ -2,6 +2,7 @@ import torch
 
 from model.TimespaceDomain import TimespaceDomain
 
+
 class SampleSpace:
     def __init__(self, timespaceDomain: TimespaceDomain):
         self.device = torch.device("cpu")
@@ -18,6 +19,7 @@ class SampleSpace:
     def getBoundaryPoints(self):
         """Generates tensor of points convering space boundary"""
         pass
-    
+
     def to(self, device):
         self.device = device
+        return self

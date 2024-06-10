@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 
+
 class PINN(nn.Module):
     """
     Simple neural network accepting two features as input and returning a single output
@@ -14,7 +15,8 @@ class PINN(nn.Module):
         self.layer_out = nn.Linear(neuronsPerLayer, 1)
         num_middle = layers - 1
         self.middle_layers = nn.ModuleList(
-            [nn.Linear(neuronsPerLayer, neuronsPerLayer) for _ in range(num_middle)]
+            [nn.Linear(neuronsPerLayer, neuronsPerLayer)
+             for _ in range(num_middle)]
         )
         self.act = act
 

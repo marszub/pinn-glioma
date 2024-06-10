@@ -23,13 +23,13 @@ class RandomSpace(SampleSpace):
 
     def getInteriorPoints(self):
         """Generates tensor of points convering interior of simulation"""
-        return self.__getX(self.interiorSize), self.__getY(self.interiorSize), self.__getT(self.interiorSize)
+        return self.__getX(self.interiorSize), self.__getY(self.interiorSize), self.getT(self.interiorSize)
 
     def getBoundaryPoints(self):
         """Generates tensor of points convering space boundary"""
         x = self.__getX(self.boundarySize)
         y = self.__getY(self.boundarySize)
-        t = self.__getT(self.boundarySize)
+        t = self.getT(self.boundarySize)
 
         xMin, xMax = self.timespaceDomain.spaceDomains[0]
         x0 = torch.full_like(x, xMin, requires_grad=True, device=self.device)
@@ -60,5 +60,5 @@ class RandomSpace(SampleSpace):
         yMin, yMax = self.timespaceDomain.spaceDomains[1]
         return self.__getVector(n, yMin, yMax)
 
-    def __getT(self, n: int) -> torch.Tensor:
+    def getT(self, n: int) -> torch.Tensor:
         raise NotImplementedError("Use of abstract method")

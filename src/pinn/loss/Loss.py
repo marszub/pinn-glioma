@@ -3,6 +3,7 @@ from pinn.simulationSpace.SampleSpace import SampleSpace
 from pinn.Pinn import PINN
 from pinn.loss.Weights import Weights
 from pinn.loss.Function import f, dfdx, dfdy, dfdt
+from pinn.loss.DataLoss import DataLoss
 
 
 class Loss:
@@ -10,11 +11,15 @@ class Loss:
         self,
         space: SampleSpace,
         experiment: Experiment,
+        data_dir_name: str,
+        data_samples_num: int,
         weights: Weights,
     ):
         self.space = space
         self.experiment = experiment
         self.weighs = weights
+        self.data_loss = DataLoss(
+            experiment.timespaceDomain, data_samples_num, data_dir_name)
 
     def __residual(self, pinn: PINN):
         x, y, t = self.space.getInteriorPoints()
@@ -62,17 +67,20 @@ class Loss:
         Not used during training! Only for checking the results later.
         """
         self.space.to(pinn.device())
+        self.data_loss.to(pinn.device())
         residual_loss = self.__residual(pinn)
         initial_loss = self.__initial(pinn)
         boundary_loss = self.__boundary(pinn)
+        data_loss = self.data_loss(pinn)
 
         final_loss = (
             self.weighs.residual * residual_loss
             + self.weighs.initial * initial_loss
             + self.weighs.boundary * boundary_loss
+            + self.weighs.data * data_loss
         )
 
-        return final_loss, residual_loss, initial_loss, boundary_loss
+        return final_loss, residual_loss, initial_loss, boundary_loss, data_loss
 
     def __call__(self, pinn: PINN):
         """

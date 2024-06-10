@@ -8,7 +8,6 @@ import torch
 from pinn.loss.Loss import Loss
 from model.Experiment import Experiment
 from train.Traininer import Trainer
-from pinn.simulationSpace.RandomSpace import RandomSpace
 
 if __name__ == "__main__":
     config = PinnConfig()
@@ -23,16 +22,19 @@ if __name__ == "__main__":
 
     initializer = Initializer(args, config, device)
 
-    learnSpace = RandomSpace(
+    from pinn.simulationSpace.ExponentialRandomSpace import ExponentialRandomSpace
+    learnSpace = ExponentialRandomSpace(
         timespaceDomain=experiment.timespaceDomain,
         initialSize=35 * 35,
         interiorSize=35 * 35 * 35,
         boundarySize=35,
-    )
+    ).to(device)
 
     loss = Loss(
         learnSpace,
         experiment,
+        args.data,
+        35 * 35,
         config.weights,
     )
     trainer = Trainer(initializer, loss)

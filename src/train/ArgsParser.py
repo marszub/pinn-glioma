@@ -31,12 +31,22 @@ class ArgsParser:
             action="store_true",
         )
         self.parser.add_argument(
+            "-d",
+            "--data",
+            help="Path to dir storing training data set. Data files should be named 'sim_state_<i>.pt' where <i> are numbers 1...n. Each file is a dict saved by pytorch containing 'time' and 'state' records.",
+            type=str,
+            default=None,
+            action="store",
+        )
+        self.parser.add_argument(
             "-l",
             "--load",
             help="Load previously trained model.",
             action="store",
         )
         self.config = self.parser.parse_args()
+        if self.config.data is not None and self.config.data.endswith('/'):
+            self.config.data = self.config.data[:-1]
 
     def get(self):
         return self.config
