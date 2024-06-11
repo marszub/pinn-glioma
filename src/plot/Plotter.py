@@ -24,9 +24,9 @@ class Plotter:
         title,
     ):
         fig, ax = plt.subplots(figsize=self.figsize, dpi=self.dpi)
-        X = x.detach().cpu().numpy()
-        Y = y.detach().cpu().numpy()
-        Z = z.detach().cpu().numpy()
+        X = x.detach().cpu().numpy().squeeze()
+        Y = y.detach().cpu().numpy().squeeze()
+        Z = z.detach().cpu().numpy().squeeze()
         ax.set_title(title)
         ax.set_xlabel("x")
         ax.set_ylabel("y")
@@ -56,9 +56,9 @@ class Plotter:
         ax.set_ylabel("y")
         ax.set_aspect('equal')
         ax.pcolormesh(
-            np.squeeze(X, axis=-1),
-            np.squeeze(Y, axis=-1),
-            np.squeeze(backgroundZ, axis=-1),
+            X.squeeze(),
+            Y.squeeze(),
+            backgroundZ.squeeze(),
             cmap="Greys",
             vmin=0,
             vmax=2*np.max(backgroundZ),
@@ -66,9 +66,9 @@ class Plotter:
         lim = self.limit if self.limit is not None else Z.max()
         alpha = np.minimum((Z-Z.min())/(lim-Z.min()), 1.0)
         c = ax.pcolormesh(
-            np.squeeze(X, axis=-1),
-            np.squeeze(Y, axis=-1),
-            np.squeeze(Z, axis=-1),
+            X.squeeze(),
+            Y.squeeze(),
+            Z.squeeze(),
             cmap=self.cmap,
             alpha=alpha,
         )

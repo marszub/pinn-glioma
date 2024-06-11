@@ -23,5 +23,6 @@ class SimulationLoader(DataProvider):
             i += 1
             filepath = f"{self.input_dir}/sim_state_{i}.pt"
         if i == 0:
-            raise FileNotFoundError(f"No simulation frames found in {self.input_dir}.")
+            raise FileNotFoundError(
+                f"No simulation frames found in {self.input_dir}.")
         print(f"Loaded {i} files.")

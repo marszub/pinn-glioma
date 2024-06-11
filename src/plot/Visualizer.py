@@ -2,6 +2,7 @@ from os import makedirs
 from typing import Callable
 import numpy as np
 import torch
+import re
 import matplotlib.pyplot as plt
 from torch import Tensor
 from plot.DataProvider import DataProvider
@@ -11,55 +12,76 @@ from pinn.simulationSpace.UniformSpace import UniformSpace
 from plot.Plotter import Plotter
 
 
+def make_title(title_lines):
+    title = ""
+    for title_line in title_lines:
+        title += title_line + "\n"
+    if len(title_lines) != 0:
+        title = title[:-1]
+    return title
+
+
 class Visualizer:
     def __init__(
         self,
-        plotter: Plotter,
-        plotSpace: UniformSpace,
-        saveDir: str,
-        transparent: bool = True,
+        plot_space: UniformSpace,
+        file_prefix: str,
+        title: list,
+        transparent: bool,
     ):
-        makedirs(saveDir, exist_ok=True)
-        self.plotter = plotter
-        self.space = plotSpace
-        self.saveDir = saveDir
+        path_match = re.fullmatch(
+            r"(?P<dir>/?([\w.-]+/)*)(?P<filename>[\w.-]+)", file_prefix)
+        error_msg = ("File prefix must end "
+                     "with non-empty file name prefix. "
+                     "Moreover, allowed path characters are: a-zA-Z0-9_.-/ "
+                     f"Actual prefix: {file_prefix}"
+                     )
+        assert path_match is not None, error_msg
+        dir_path = path_match.group("dir")
+        if dir_path == "":
+            dir_path = "."
+        if dir_path[-1] == "/" and len(dir_path) > 1:
+            dir_path = dir_path[:-1]
+        makedirs(dir_path, exist_ok=True)
+        self.space = plot_space
+        self.file_prefix = file_prefix
+        self.title = title
         self.transparent = transparent
 
     def plotIC(
         self,
         initialCondition: Callable,
-        title: str,
-        name: str,
+        plotter: Plotter,
         diffusionMap: Callable = None
     ):
         x, y, _ = self.space.getInitialPointsKeepDims()
         z = initialCondition(x, y)
         if diffusionMap is None:
-            fig = self.plotter.plot(
+            fig = plotter.plot(
                 z,
                 x,
                 y,
-                title,
+                make_title(self.title),
             )
         else:
             D = diffusionMap(x, y)
-            fig = self.plotter.plotWithBackground(
+            fig = plotter.plotWithBackground(
                 z,
                 D,
                 x,
                 y,
-                title,
+                make_title(self.title),
             )
         plt.figure(fig)
         plt.savefig(
-            f"{self.saveDir}/{name}.png",
+            f"{self.file_prefix}.png",
             transparent=self.transparent,
         )
 
-    def plotLosses(self, loss_over_time, fileName, labels=[]):
+    def plotLosses(self, loss_over_time, labels=[]):
         average_loss = self.__runningAverrage(loss_over_time, window=100)
         fig, ax = plt.subplots(figsize=(8, 6), dpi=100)
-        ax.set_title("Loss function (runnig average)")
+        ax.set_title(make_title(self.title))
         ax.set_xlabel("Epoch")
         ax.set_ylabel("Loss")
         ax.plot(average_loss, label=labels)
@@ -67,11 +89,11 @@ class Visualizer:
         if len(labels) > 0:
             plt.legend()
         plt.savefig(
-            f"{self.saveDir}/{fileName}", transparent=self.transparent
+            f"{self.file_prefix}.png", transparent=self.transparent
         )
         plt.close()
 
-    def plotLossMinMax(self, lossOverTime, fileName):
+    def plotLossMinMax(self, lossOverTime):
         intervalsNum = 200
         intervals = self.__splitIntervals(lossOverTime, intervalsNum)
         intervalSize = intervals.shape[1]
@@ -83,7 +105,7 @@ class Visualizer:
         globalMinY = np.min(minLoss)
 
         fig, ax = plt.subplots(figsize=(8, 6), dpi=100)
-        ax.set_title("Loss function (averrage in intervals)")
+        ax.set_title(make_title(self.title))
         ax.set_xlabel("Epoch")
         ax.set_ylabel("Loss")
         ax.plot(x, avgLoss, label="Averrage loss")
@@ -94,25 +116,25 @@ class Visualizer:
         ax.set_yscale("log")
         plt.legend()
         plt.savefig(
-            f"{self.saveDir}/{fileName}", transparent=self.transparent
+            f"{self.file_prefix}.png", transparent=self.transparent
         )
         plt.close()
 
     def plotSizeOverTime(
-        self, times: Tensor, sizes: Tensor, filename: str, title: str
+        self, times: Tensor, sizes: Tensor
     ):
         fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
-        ax.set_title(title)
+        ax.set_title(make_title(self.title))
         ax.set_xlabel("Time [days]")
         ax.set_ylabel("Tumor size")
         ax.plot(times, sizes)
         plt.savefig(
-            f"{self.saveDir}/{''.join(letter for letter in filename if letter.isalnum())}.png",
+            f"{self.file_prefix}.png",
             transparent=self.transparent
         )
         plt.close()
 
-    def plotTreatment(self, treatment: Callable, name: str):
+    def plotTreatment(self, treatment: Callable):
         t = torch.linspace(
             self.space.timespaceDomain.timeDomain[0],
             self.space.timespaceDomain.timeDomain[1],
@@ -124,29 +146,31 @@ class Visualizer:
         plt.plot(t, f)
         plt.xlabel('Time in days')
         plt.ylabel('Therapy factor')
-        plt.title(name)
+        plt.title(make_title(self.title))
         plt.grid(True)
         plt.savefig(
-            f"{self.saveDir}/{name}.png", transparent=self.transparent
+            f"{self.file_prefix}.png", transparent=self.transparent
         )
         plt.close()
 
     def animateProgress(
         self,
         data_provider: DataProvider,
-        fileName: str,
+        plotter: Plotter,
         diffusion: Callable = None
     ):
         class Iteration:
             def __init__(
                 self,
-                save_dir: str,
+                file_prefix: str,
+                title: str,
                 plotter: Plotter,
                 transparent: bool,
                 space: TimespaceDomain,
                 diffusion: Callable
             ):
-                self.save_dir = save_dir
+                self.file_prefix = file_prefix
+                self.title = title
                 self.plotter = plotter
                 self.transparent = transparent
                 self.space = space
@@ -157,17 +181,18 @@ class Visualizer:
             def __call__(self, t, u):
                 assert u.shape[0] == u.shape[1]
                 spatial_resolution = u.shape[0]
-                frameName = self.save_dir + f"/{fileName}_{self.i}.png"
+                frameName = f"{self.file_prefix}_{self.i}.png"
                 space = UniformSpace(self.space, spatial_resolution, 0)
                 x, y, _ = space.getInitialPointsKeepDims()
                 x = x.squeeze(axis=-1)
                 y = y.squeeze(axis=-1)
+                title = make_title(self.title + [f"(t={t:4.2f})"])
                 if self.diffusion is None:
                     _ = self.plotter.plot(
                         u,
                         x,
                         y,
-                        f"PINN (t={t:4.2f})",
+                        title,
                     )
                 else:
                     D = self.diffusion(x, y)
@@ -176,7 +201,7 @@ class Visualizer:
                         D,
                         x,
                         y,
-                        f"PINN (t={t:0,.2f})",
+                        title,
                     )
                 self.frame_file_names.append(frameName)
                 plt.savefig(
@@ -188,19 +213,18 @@ class Visualizer:
                 self.i += 1
 
         iteration = Iteration(
-            self.saveDir,
-            self.plotter,
+            self.file_prefix,
+            self.title,
+            plotter,
             self.transparent,
             data_provider.timespace_domain,
             diffusion
         )
 
         data_provider.for_each_frame(iteration)
-        self.__makeGif(
-            frameFileNames=iteration.frame_file_names, fileName=fileName
-        )
+        self.__makeGif(frameFileNames=iteration.frame_file_names)
 
-    def __makeGif(self, frameFileNames, fileName):
+    def __makeGif(self, frameFileNames):
         try:
             from PIL import Image
 
@@ -209,7 +233,7 @@ class Visualizer:
                 image = Image.open(file)
                 frames.append(image)
             frames[0].save(
-                self.saveDir + f"/{fileName}.gif",
+                f"{self.file_prefix}.gif",
                 format="GIF",
                 append_images=frames[1:],
                 save_all=True,
