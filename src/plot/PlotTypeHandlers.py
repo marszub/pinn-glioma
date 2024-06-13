@@ -18,6 +18,46 @@ def load_model(model_path: str, space: UniformSpace, experiment: Experiment):
     exit()
 
 
+def load_comparable_models(
+    model1_path: str,
+    model2_path: str,
+    space: UniformSpace,
+    experiment: Experiment
+):
+    from os import path
+    from plot.SimulationLoader import SimulationLoader
+    from plot.PinnEvaluator import PinnEvaluator
+    from pinn.PinnConfig import PinnConfig
+
+    config = PinnConfig()
+    model1 = None
+    model2 = None
+    times = None
+
+    if path.isdir(model1_path):
+        print("model1 is simulation")
+        model1 = SimulationLoader(model1_path, experiment.timespaceDomain)
+        space = model1.get_sample_space()
+        times = model1.get_times()
+
+    if path.isdir(model2_path):
+        print("model2 is simulation")
+        model2 = SimulationLoader(model2_path, experiment.timespaceDomain)
+        space = model2.get_sample_space()
+        times = model2.get_times()
+
+    if path.isfile(model1_path):
+        print("model1 is pinn")
+        model1 = PinnEvaluator(model1_path, space, config, times)
+
+    if path.isfile(model2_path):
+        print("model2 is pinn")
+        model2 = PinnEvaluator(model2_path, space, config, times)
+
+    assert model1 is not None and model2 is not None
+    return model1, model2
+
+
 def plot_animation(args):
     from plot.Plotter import Plotter
     from plot.Visualizer import Visualizer
@@ -93,11 +133,48 @@ def plot_size_over_time(args):
     )
     data_provider = load_model(args.input, space, experiment)
     times, sizes = data_provider.get_size_over_time()
-    visualizer.plotSizeOverTime(times, sizes)
+    visualizer.plotSizeOverTime(times, sizes, y_title="Tumor size")
 
 
 def plot_difference(args):
-    raise NotImplementedError()
+    from plot.Visualizer import Visualizer
+    import torch
+
+    experiment = Experiment()
+
+    timeResolution = 50
+    spaceResoultion = 150
+
+    space = UniformSpace(
+        timespaceDomain=experiment.timespaceDomain,
+        spaceResoultion=spaceResoultion,
+        timeResoultion=timeResolution,
+        requiresGrad=False,
+    )
+    visualizer = Visualizer(
+        space, args.output, args.title, args.plot_transparent
+    )
+    with torch.no_grad():
+        model1_data, model2_data = load_comparable_models(
+            args.model1, args.model2, space, experiment)
+        diffs = []
+        times = []
+        for (t1, u1), (t2, u2) in zip(model1_data.iterator(), model2_data.iterator()):
+            assert torch.isclose(t1, t2)
+            u1 = u1.reshape((-1,))
+            u2 = u2.reshape((-1,))
+            diff = torch.sum(torch.abs(u1 - u2))
+            diffs.append(diff)
+            times.append(t1)
+            u_size = torch.numel(u1)
+        print(u_size)
+        diffs = (
+            torch.tensor(diffs) /
+            experiment.timespaceDomain.get_points_per_space_unit(u_size)
+        )
+        times = torch.tensor(times)
+        visualizer.plotSizeOverTime(
+            times, diffs, y_title="Tumor concentration difference")
 
 
 def plot_diffusion(args):

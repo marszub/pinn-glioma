@@ -121,12 +121,12 @@ class Visualizer:
         plt.close()
 
     def plotSizeOverTime(
-        self, times: Tensor, sizes: Tensor
+        self, times: Tensor, sizes: Tensor, y_title: str
     ):
         fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
         ax.set_title(make_title(self.title))
         ax.set_xlabel("Time [days]")
-        ax.set_ylabel("Tumor size")
+        ax.set_ylabel(y_title)
         ax.plot(times, sizes)
         plt.savefig(
             f"{self.file_prefix}.png",
