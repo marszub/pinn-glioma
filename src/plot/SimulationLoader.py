@@ -26,3 +26,18 @@ class SimulationLoader(DataProvider):
             raise FileNotFoundError(
                 f"No simulation frames found in {self.input_dir}.")
         print(f"Loaded {i} files.")
+
+    def iterator(self):
+        i = 0
+        filepath = f"{self.input_dir}/sim_state_{i}.pt"
+        while path.isfile(filepath):
+            loaded_state = torch.load(filepath)
+            t = loaded_state["time"]
+            u = loaded_state["state"]
+            yield t, u
+            i += 1
+            filepath = f"{self.input_dir}/sim_state_{i}.pt"
+        if i == 0:
+            raise FileNotFoundError(
+                f"No simulation frames found in {self.input_dir}.")
+        print(f"Loaded {i} files.")

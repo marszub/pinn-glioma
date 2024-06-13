@@ -97,7 +97,33 @@ def plot_size_over_time(args):
 
 
 def plot_difference(args):
-    raise NotImplementedError()
+    from plot.Visualizer import Visualizer
+
+    experiment = Experiment()
+
+    timeResolution = 50
+    spaceResoultion = 150
+
+    space = UniformSpace(
+        timespaceDomain=experiment.timespaceDomain,
+        spaceResoultion=spaceResoultion,
+        timeResoultion=timeResolution,
+        requiresGrad=False,
+    )
+    visualizer = Visualizer(
+        space, args.output, args.title, args.plot_transparent
+    )
+    model1_data = load_model(args.model1, space, experiment)
+    model2_data = load_model(args.model2, space, experiment)
+    diffs = []
+    for (t1, u1), (t2, u2) in zip(model1_data.iterator(), model2_data.iterator()):
+        # TODO: Make sure this works
+        assert t1 == t2
+        diff = torch.sum(torch.abs(u1 - u2))
+        diffs.append(diff)
+    diffs = torch.tensor(diffs)
+    # TODO: Dedicated plot function. Also needs to be tested
+    visualizer.plotSizeOverTime(times, sizes)
 
 
 def plot_diffusion(args):

@@ -32,3 +32,22 @@ class PinnEvaluator(DataProvider):
             )
             u = self.pinn(x, y, t)
             action(time_value, u)
+
+    def iterator(self):
+        x, y, _ = self.space.getInitialPointsKeepDims()
+        for i in range(self.space.timeResoultion):
+            time_value = (
+                self.space.timespaceDomain.timeDomain[0]
+                + i
+                * (
+                    self.space.timespaceDomain.timeDomain[1]
+                    - self.space.timespaceDomain.timeDomain[0]
+                )
+                / self.space.timeResoultion
+            )
+            t = full_like(
+                x,
+                time_value,
+            )
+            u = self.pinn(x, y, t)
+            yield time_value, u

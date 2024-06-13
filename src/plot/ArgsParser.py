@@ -3,7 +3,7 @@ from plot.PlotTypeHandlers import (
     plot_animation,
     plot_initial_condition,
     plot_size_over_time,
-    plot_difference,
+    plot_difference,ArgsPa
     plot_treatment,
     plot_diffusion,
     plot_loss,
