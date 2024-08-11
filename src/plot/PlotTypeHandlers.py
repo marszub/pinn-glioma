@@ -8,7 +8,7 @@ def load_model(model_path: str, space: UniformSpace, experiment: Experiment):
     if path.isfile(model_path):
         from plot.PinnEvaluator import PinnEvaluator
         from pinn.PinnConfig import PinnConfig
-        config = PinnConfig()
+        config = PinnConfig(experiment)
         return PinnEvaluator(model_path, space, config)
     elif path.isdir(model_path):
         from plot.SimulationLoader import SimulationLoader
@@ -29,7 +29,7 @@ def load_comparable_models(
     from plot.PinnEvaluator import PinnEvaluator
     from pinn.PinnConfig import PinnConfig
 
-    config = PinnConfig()
+    config = PinnConfig(experiment)
     model1 = None
     model2 = None
     times = None
@@ -108,7 +108,7 @@ def plot_initial_condition(args):
         space, args.output, args.title, args.plot_transparent
     )
     visualizer.plotIC(
-        experiment.getInitialCondition(),
+        experiment.ic,
         plotter,
         diffusion
     )
@@ -179,12 +179,14 @@ def plot_difference(args):
 
 def plot_diffusion(args):
     from plot.Visualizer import Visualizer
+    from plot.Plotter import Plotter
 
     experiment = Experiment()
 
     timeResolution = 20
     spaceResoultion = 300
 
+    plotter = Plotter()
     space = UniformSpace(
         timespaceDomain=experiment.timespaceDomain,
         spaceResoultion=spaceResoultion,
@@ -196,6 +198,7 @@ def plot_diffusion(args):
     )
     visualizer.plotIC(
         experiment.diffusion,
+        plotter,
     )
 
 
@@ -244,7 +247,8 @@ def plot_loss(args):
         exit()
     visualizer.plotLosses(
         loss_over_time=lossOverTime,
-        labels=["Total", "Residual", "Initial", "Boundary", "Data"],
+        labels=["Total", "Residual", "Initial",
+                "Boundary", "Data", "Validation"],
     )
 
 

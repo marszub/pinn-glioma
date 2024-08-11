@@ -32,11 +32,21 @@ class ArgsParser:
         )
         self.parser.add_argument(
             "-d",
-            "--data",
-            help="Path to dir storing training data set. Data files should be named 'sim_state_<i>.pt' where <i> are numbers 1...n. Each file is a dict saved by pytorch containing 'time' and 'state' records.",
+            "--data-dir",
+            help="Path to dir storing training data set. The dir should contain ONLY training data files. Each file is a dict saved by pytorch containing 'time' and 'state' records.",
             type=str,
             default=None,
             action="store",
+            dest="data_dir",
+        )
+        self.parser.add_argument(
+            "-v",
+            "--validation-dir",
+            help="Path to dir storing validation data set. The dir should contain ONLY training data files. Each file is a dict saved by pytorch containing 'time' and 'state' records.",
+            type=str,
+            default=None,
+            action="store",
+            dest="validation_dir",
         )
         self.parser.add_argument(
             "-l",
@@ -45,8 +55,14 @@ class ArgsParser:
             action="store",
         )
         self.config = self.parser.parse_args()
-        if self.config.data is not None and self.config.data.endswith('/'):
-            self.config.data = self.config.data[:-1]
+        self.config.data_dir = self.__trim_dir(self.config.data_dir)
+        self.config.validation_dir = self.__trim_dir(self.config.validation_dir)
+
+    def __trim_dir(self, dir_name):
+        if dir_name is not None and dir_name.endswith('/'):
+            return dir_name[:-1]
+        return dir_name
+
 
     def get(self):
         return self.config

@@ -14,7 +14,7 @@ class Trainer:
         bestModel = self.initializer.getBestModel()
         tracker = self.initializer.getTracker()
         optimizer = self.initializer.getOptimizer()
-        tracker.start(self.loss.verbose(bestModel), bestModel)
+        tracker.start(self.loss.validate(bestModel), bestModel)
         while tracker.isTraining():
             try:
                 self.nn.train()
@@ -25,6 +25,6 @@ class Trainer:
                 self.nn.eval()
 
                 await asyncio.sleep(0)
-                tracker.update(self.loss.verbose(self.nn), self.nn, optimizer)
+                tracker.update(self.loss.validate(self.nn), self.nn, optimizer)
             except KeyboardInterrupt:
                 tracker.terminate()

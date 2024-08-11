@@ -5,4 +5,4 @@ docker run --gpus all --ipc=host -itd \
 --workdir /workspace \
 --name torch_cuda \
 nvcr.io/nvidia/pytorch:23.04-py3 \
-bash -c 'python -m pip install nibabel ; exec /bin/bash'
+bash -c 'python -m pip install nibabel rich ; exec /bin/bash'

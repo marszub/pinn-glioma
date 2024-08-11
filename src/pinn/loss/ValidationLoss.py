@@ -6,11 +6,10 @@ from pinn.Pinn import PINN
 from model.DataLoader import DataLoader
 
 
-class DataLoss:
+class ValidationLoss:
     def __init__(
         self,
         timespace_domain: TimespaceDomain,
-        samples_num: int,
         data_dir_name: str = None,
     ):
         if data_dir_name is None:
@@ -41,8 +40,6 @@ class DataLoss:
             indexing="ij")
         self.input = torch.stack(inputs, axis=-1).reshape((-1, 3))
         self.gt = u.reshape((-1, 1))
-        self.sample_size = samples_num
-        self.dataset_size = self.input.shape[0]
         self.device = torch.device("cpu")
         # is_data indicates if member tensors exist.
         # If not, it means no data set was provided.
@@ -51,12 +48,12 @@ class DataLoss:
     def __call__(self, pinn: PINN):
         if not self.is_data:
             return torch.tensor(0.0, device=self.device)
-        indices = torch.randint(
-            self.dataset_size, (self.sample_size,), device=self.device)
-        input = self.input[indices]
-        gt = self.gt[indices]
-        output = pinn(input[:, 0:1], input[:, 1:2], input[:, 2:3])
-        return (gt - output).pow(2).mean()
+        output = pinn(
+            self.input[:, 0:1],
+            self.input[:, 1:2],
+            self.input[:, 2:3],
+        )
+        return (self.gt - output).pow(2).mean()
 
     def to(self, device):
         self.device = device
