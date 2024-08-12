@@ -27,9 +27,9 @@ for ((i=10; i<100 ; i+=10)); do
         cp ${WORKDIR}/simulation/sim_state_${i}.pt ${WORKDIR}/valid-data
     fi
 done
-mv ${WORKDIR}/simulation/sim_state_99.pt ${WORKDIR}/valid-data/
+cp ${WORKDIR}/simulation/sim_state_99.pt ${WORKDIR}/valid-data/
 
-/workspace/src/train.py -o ${WORKDIR}/pinn/ -e 20000 \
+/workspace/src/train.py -o ${WORKDIR}/pinn/ -e 10000 \
 -d ${WORKDIR}/train-data/ -v ${WORKDIR}/valid-data/
 /workspace/src/plot.py -o ${WORKDIR}/pinn-plots/anim-pinn \
 --title "PINN animation" animation --max-u 0.5 ${WORKDIR}/pinn/model_best.pt
