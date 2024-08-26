@@ -12,7 +12,12 @@ class Saver:
 
     def saveEvalModel(self, model):
         device = model.device()
-        save(model.cpu().state_dict(), self.evalModelPath)
+        save_dict = {
+            "layers": model.layers,
+            "neurons": model.neurons,
+            "model": model.cpu().state_dict(),
+        }
+        save(save_dict, self.evalModelPath)
         model.to(device)
 
     def saveTraining(
@@ -22,6 +27,8 @@ class Saver:
         save(
             {
                 "epoch": epoch,
+                "layers": model.layers,
+                "neurons": model.neurons,
                 "bestModel": bestModel.cpu().state_dict(),
                 "model": model.cpu().state_dict(),
                 "optimizer": optimizer.state_dict(),

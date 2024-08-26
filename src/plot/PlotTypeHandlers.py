@@ -7,9 +7,7 @@ def load_model(model_path: str, space: UniformSpace, experiment: Experiment):
 
     if path.isfile(model_path):
         from plot.PinnEvaluator import PinnEvaluator
-        from pinn.PinnConfig import PinnConfig
-        config = PinnConfig(experiment)
-        return PinnEvaluator(model_path, space, config)
+        return PinnEvaluator(model_path, space)
     elif path.isdir(model_path):
         from plot.SimulationLoader import SimulationLoader
         return SimulationLoader(
@@ -27,9 +25,7 @@ def load_comparable_models(
     from os import path
     from plot.SimulationLoader import SimulationLoader
     from plot.PinnEvaluator import PinnEvaluator
-    from pinn.PinnConfig import PinnConfig
 
-    config = PinnConfig(experiment)
     model1 = None
     model2 = None
     times = None
@@ -48,11 +44,11 @@ def load_comparable_models(
 
     if path.isfile(model1_path):
         print("model1 is pinn")
-        model1 = PinnEvaluator(model1_path, space, config, times)
+        model1 = PinnEvaluator(model1_path, space, times)
 
     if path.isfile(model2_path):
         print("model2 is pinn")
-        model2 = PinnEvaluator(model2_path, space, config, times)
+        model2 = PinnEvaluator(model2_path, space, times)
 
     assert model1 is not None and model2 is not None
     return model1, model2
@@ -159,7 +155,8 @@ def plot_difference(args):
             args.model1, args.model2, space, experiment)
         diffs = []
         times = []
-        for (t1, u1), (t2, u2) in zip(model1_data.iterator(), model2_data.iterator()):
+        for (t1, u1), (t2, u2) in zip(
+                model1_data.iterator(), model2_data.iterator()):
             assert torch.isclose(t1, t2)
             u1 = u1.reshape((-1,))
             u2 = u2.reshape((-1,))

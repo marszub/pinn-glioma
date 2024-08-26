@@ -1,9 +1,9 @@
 from plot.DataProvider import DataProvider
-from torch import load, full_like, tensor
-from pinn.PinnConfig import PinnConfig
+from torch import full_like, tensor
 from typing import Callable
 from pinn.simulationSpace.UniformSpace import UniformSpace
 from typing import Optional
+from pinn.Loader import loadModel
 
 
 class PinnEvaluator(DataProvider):
@@ -11,15 +11,12 @@ class PinnEvaluator(DataProvider):
         self,
         filename: str,
         space: UniformSpace,
-        config: PinnConfig,
         times: Optional[list] = None
     ):
         super().__init__(space.timespaceDomain)
         self.space = space
 
-        self.pinn = config.getNeuralNetwork()
-        self.pinn.load_state_dict(load(filename))
-        self.pinn.eval()
+        self.pinn = loadModel(filename)
 
         if times is None:
             times = [

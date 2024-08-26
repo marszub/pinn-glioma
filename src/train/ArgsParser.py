@@ -17,6 +17,22 @@ class ArgsParser:
         )
 
         self.parser.add_argument(
+            "--neurons",
+            help="Number of neurons in each hidden layer. If --load option is chosen, this value is ignored. (default: %(default)s)",
+            type=int,
+            default=120,
+            action="store",
+        )
+
+        self.parser.add_argument(
+            "--layers",
+            help="Number of hidden layers. If --load option is chosen, this value is ignored. (default: %(default)s)",
+            type=int,
+            default=4,
+            action="store",
+        )
+
+        self.parser.add_argument(
             "-o",
             "--output",
             default="tmp",
@@ -56,13 +72,13 @@ class ArgsParser:
         )
         self.config = self.parser.parse_args()
         self.config.data_dir = self.__trim_dir(self.config.data_dir)
-        self.config.validation_dir = self.__trim_dir(self.config.validation_dir)
+        self.config.validation_dir = self.__trim_dir(
+            self.config.validation_dir)
 
     def __trim_dir(self, dir_name):
         if dir_name is not None and dir_name.endswith('/'):
             return dir_name[:-1]
         return dir_name
-
 
     def get(self):
         return self.config

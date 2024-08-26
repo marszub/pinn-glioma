@@ -11,6 +11,8 @@ class PINN(nn.Module):
 
     def __init__(self, layers: int, neuronsPerLayer: int, act=nn.Tanh()):
         super().__init__()
+        self.layers = layers
+        self.neurons = neuronsPerLayer
         self.layer_in = nn.Linear(3, neuronsPerLayer)
         self.layer_out = nn.Linear(neuronsPerLayer, 1)
         num_middle = layers - 1

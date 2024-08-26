@@ -1,5 +1,3 @@
-from pinn.Pinn import PINN
-from torch import nn
 from pinn.loss.Loss import Loss
 from model.Experiment import Experiment
 
@@ -47,6 +45,3 @@ class PinnConfig:
             data=(1.0, data_loss),
             validation=validation_loss,
         )
-
-    def getNeuralNetwork(self) -> PINN:
-        return PINN(layers=4, neuronsPerLayer=120, act=nn.Tanh())
