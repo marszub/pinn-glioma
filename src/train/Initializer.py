@@ -58,7 +58,12 @@ class Initializer:
             )
         from train.tracking.AutosaveTracker import AutosaveTracker
 
-        return AutosaveTracker(modelSaver, epochs=self.runConfig.epochs, epoch=self.epoch, lossValues=self.lossOverTime)
+        return AutosaveTracker(
+            modelSaver,
+            epochs=self.runConfig.epochs,
+            epoch=self.epoch,
+            lossValues=self.lossOverTime,
+        )
 
     def getTrainModel(self):
         return self.trainModel

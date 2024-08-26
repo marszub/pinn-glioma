@@ -3,11 +3,15 @@ from model.Experiment import Experiment
 
 
 class PinnConfig:
-    def __init__(self, experiment: Experiment, data_dir: str = None, validation_dir: str = None):
+    def __init__(
+        self,
+        experiment: Experiment,
+        data_dir: str = None,
+        validation_dir: str = None,
+    ):
         from pinn.loss.SampleSizes import SampleSizes
         from pinn.sample.interior.ExponentialRandom import ExponentialRandom
         from pinn.loss.ResidualLoss import ResidualLoss
-        from pinn.loss.InitialLoss import InitialLoss
         from pinn.loss.BoundaryLoss import BoundaryLoss
         from pinn.loss.DataLoss import DataLoss
         from pinn.loss.ValidationLoss import ValidationLoss
@@ -19,11 +23,15 @@ class PinnConfig:
             rate=1.0
         )
         residual_loss = ResidualLoss(experiment, interior_sample)
-        initial_loss = InitialLoss(
-            experiment.timespaceDomain,
-            sample_sizes.initial,
-            experiment.ic,
-        )
+        from pinn.loss.ZeroLoss import ZeroLoss
+        initial_loss = ZeroLoss()
+
+        # from pinn.loss.InitialLoss import InitialLoss
+        # initial_loss = InitialLoss(
+        #     experiment.timespaceDomain,
+        #     sample_sizes.initial,
+        #     experiment.ic,
+        # )
         boundary_loss = BoundaryLoss(
             experiment.timespaceDomain,
             sample_sizes.boundary,
