@@ -6,6 +6,7 @@ class SampleSizes(NamedTuple):
     initial: int
     data: int
     interior: int
+    validation: int
 
     @staticmethod
     def scaled(scale: int):
@@ -14,4 +15,5 @@ class SampleSizes(NamedTuple):
             initial=scale**2,
             data=scale**2,
             interior=scale**3,
+            validation=scale**2
         )

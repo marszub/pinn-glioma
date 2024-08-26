@@ -37,7 +37,8 @@ class PinnConfig:
         )
         validation_loss = ValidationLoss(
             experiment.timespaceDomain,
-            validation_dir,
+            samples_num=sample_sizes.validation,
+            data_dir_name=validation_dir,
         )
         self.loss = Loss(
             residual=(2.0, residual_loss),

@@ -18,13 +18,18 @@ class Trainer:
         while tracker.isTraining():
             try:
                 self.nn.train()
-                loss: torch.Tensor = self.loss(self.nn)
+                losses: tuple = self.loss.verbose(self.nn)
+                losses_copy = tuple(
+                    [loss.detach().clone() for loss in losses])
                 optimizer.zero_grad()
-                loss.backward()
+                losses[0].backward()
                 optimizer.step()
                 self.nn.eval()
 
                 await asyncio.sleep(0)
-                tracker.update(self.loss.validate(self.nn), self.nn, optimizer)
+                tracker.update(
+                    losses_copy + (self.loss.validation(self.nn),),
+                    self.nn, optimizer,
+                )
             except KeyboardInterrupt:
                 tracker.terminate()

@@ -11,6 +11,7 @@ class ValidationLoss:
         self,
         timespace_domain: TimespaceDomain,
         data_dir_name: str = None,
+        samples_num: int = None,
     ):
         if data_dir_name is None:
             self.is_data = False
@@ -38,22 +39,33 @@ class ValidationLoss:
             y_linspace,
             t_linspace,
             indexing="ij")
+
         self.input = torch.stack(inputs, axis=-1).reshape((-1, 3))
         self.gt = u.reshape((-1, 1))
+        if samples_num is not None:
+            assert self.input.shape[0] >= samples_num
+            indices = torch.randperm(self.input.shape[0])[:samples_num]
+            self.input = self.input[indices, :]
+            self.gt = self.gt[indices, :]
         self.device = torch.device("cpu")
         # is_data indicates if member tensors exist.
         # If not, it means no data set was provided.
         self.is_data = True
 
+    def size(self):
+        return self.input.shape[0]
+
     def __call__(self, pinn: PINN):
         if not self.is_data:
             return torch.tensor(0.0, device=self.device)
-        output = pinn(
-            self.input[:, 0:1],
-            self.input[:, 1:2],
-            self.input[:, 2:3],
-        )
-        return (self.gt - output).pow(2).mean()
+        with torch.no_grad():
+            output = pinn(
+                self.input[:, 0:1],
+                self.input[:, 1:2],
+                self.input[:, 2:3],
+            )
+            loss_value = (self.gt - output).pow(2).mean()
+        return loss_value
 
     def to(self, device):
         self.device = device
