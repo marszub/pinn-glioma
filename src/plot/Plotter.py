@@ -7,7 +7,7 @@ class Plotter:
     def __init__(
         self,
         figsize=(8, 6),
-        dpi=100,
+        dpi=200,
         cmap="viridis",
         limit=None
     ):
@@ -23,7 +23,8 @@ class Plotter:
         y: Tensor,
         title,
     ):
-        fig, ax = plt.subplots(figsize=self.figsize, dpi=self.dpi)
+        fig, ax = plt.subplots(figsize=self.figsize,
+                               dpi=self.dpi, num=1, clear=True)
         X = x.detach().cpu().numpy().squeeze()
         Y = y.detach().cpu().numpy().squeeze()
         Z = z.detach().cpu().numpy().squeeze()
@@ -46,7 +47,8 @@ class Plotter:
         y: Tensor,
         title,
     ):
-        fig, ax = plt.subplots(figsize=self.figsize, dpi=self.dpi)
+        fig, ax = plt.subplots(figsize=self.figsize,
+                               dpi=self.dpi, num=1, clear=True)
         X = x.detach().cpu().numpy()
         Y = y.detach().cpu().numpy()
         Z = z.detach().cpu().numpy()

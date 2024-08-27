@@ -91,7 +91,6 @@ class Visualizer:
         plt.savefig(
             f"{self.file_prefix}.png", transparent=self.transparent
         )
-        plt.close()
 
     def plotLossMinMax(self, lossOverTime):
         intervalsNum = 200
@@ -118,7 +117,6 @@ class Visualizer:
         plt.savefig(
             f"{self.file_prefix}.png", transparent=self.transparent
         )
-        plt.close()
 
     def plotSizeOverTime(
         self, times: Tensor, sizes: Tensor, y_title: str
@@ -132,7 +130,6 @@ class Visualizer:
             f"{self.file_prefix}.png",
             transparent=self.transparent
         )
-        plt.close()
 
     def plotTreatment(self, treatment: Callable):
         t = torch.linspace(
@@ -151,7 +148,6 @@ class Visualizer:
         plt.savefig(
             f"{self.file_prefix}.png", transparent=self.transparent
         )
-        plt.close()
 
     def animateProgress(
         self,
@@ -209,7 +205,6 @@ class Visualizer:
                     transparent=self.transparent,
                     facecolor="white",
                 )
-                plt.close()
                 self.i += 1
 
         iteration = Iteration(

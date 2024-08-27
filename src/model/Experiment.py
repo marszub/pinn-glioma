@@ -1,5 +1,6 @@
 from model.InitialCondition import InitialCondition
 from model.LoadedDiffusionMap import LoadedDiffusionMap
+# from model.LoadedInitialCondition import LoadedInitialCondition
 from model.Treatment import Treatment
 from model.TimespaceDomain import TimespaceDomain
 
@@ -24,3 +25,4 @@ class Experiment:
             timeBetweenDoses=20.0,
         )
         self.ic = InitialCondition((28.0, 45.0), 0.4, 10)
+        # self.ic = LoadedInitialCondition(self.timespaceDomain, "resources/diffusion_map.pt")
