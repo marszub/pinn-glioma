@@ -109,6 +109,7 @@ class ArgsParser:
             type=str,
             action="append",
             metavar="TITLE",
+            default=[],
         )
         parser.add_argument(
             "--plot-transparent",
