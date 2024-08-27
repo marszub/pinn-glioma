@@ -17,12 +17,12 @@ class Experiment:
             "resources/diffusion_map.pt"
         )
         self.treatment = Treatment(
-            absorptionRate=0.5,
-            decayRate=0.02,
-            dose=0.05,
-            firstDoseTime=50.0,
-            dosesNum=2,
-            timeBetweenDoses=20.0,
+            absorptionRate=0.05,
+            decayRate=0.005,
+            dose=0.08,
+            firstDoseTime=15.0,
+            dosesNum=3,
+            timeBetweenDoses=30.0,
         )
         # self.ic = InitialCondition((28.0, 45.0), 0.4, 10)
         self.ic = LoadedInitialCondition(
