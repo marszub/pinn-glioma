@@ -173,13 +173,22 @@ class Visualizer:
                 self.diffusion = diffusion
                 self.i = 0
                 self.frame_file_names = []
+                self.D = None
 
             def __call__(self, t, u):
                 assert u.shape[0] == u.shape[1]
                 spatial_resolution = u.shape[0]
                 frameName = f"{self.file_prefix}_{self.i}.png"
-                space = UniformSpace(self.space, spatial_resolution, 0)
-                x, y, _ = space.getInitialPointsKeepDims()
+                points = self.plotter.dpi * \
+                    max(self.plotter.figsize[0], self.plotter.figsize[1])
+                if spatial_resolution > 2 * points:
+                    indices = list(range(0, spatial_resolution,
+                                   spatial_resolution//points + 1))
+                    space = UniformSpace(self.space, spatial_resolution, 0)
+                    x, y, _ = space.getInitialPointsKeepDims()
+                    x = x[indices][:, indices]
+                    y = y[indices][:, indices]
+                    u = u[indices][:, indices]
                 x = x.squeeze(axis=-1)
                 y = y.squeeze(axis=-1)
                 title = make_title(self.title + [f"(t={t:4.2f})"])
@@ -191,7 +200,8 @@ class Visualizer:
                         title,
                     )
                 else:
-                    D = self.diffusion(x, y)
+                    if self.D is None:
+                        D = self.diffusion(x, y)
                     _ = self.plotter.plotWithBackground(
                         u,
                         D,
