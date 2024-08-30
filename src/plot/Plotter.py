@@ -1,4 +1,4 @@
-from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt, colors
 import numpy as np
 from torch import Tensor
 
@@ -13,8 +13,20 @@ class Plotter:
     ):
         self.figsize = figsize
         self.dpi = dpi
-        self.cmap = cmap
         self.limit = limit
+        self.levels = 10
+        cmap_obj = plt.get_cmap(cmap)
+        rgb = cmap_obj(
+            np.arange(0, cmap_obj.N, cmap_obj.N//self.levels))[:, :3]
+        alpha = 1. - np.min(rgb, axis=1)
+        alpha = np.expand_dims(alpha, -1)
+        rgba = np.concatenate(((rgb + alpha - 1) / alpha, alpha), axis=1)
+        rgba[0] = np.array([0, 0, 0, 0])
+
+        self.front_cmap = colors.ListedColormap(
+            rgba, name=cmap + "_alpha")
+        self.cmap = colors.ListedColormap(
+            rgb, name=cmap + "_steps")
 
     def plot(
         self,
@@ -66,13 +78,11 @@ class Plotter:
             vmax=2*np.max(backgroundZ),
         )
         lim = self.limit if self.limit is not None else Z.max()
-        alpha = np.minimum((Z-Z.min())/(lim-Z.min()), 1.0)
         c = ax.pcolormesh(
             X.squeeze(),
             Y.squeeze(),
             Z.squeeze(),
-            cmap=self.cmap,
-            alpha=alpha,
+            cmap=self.front_cmap,
         )
         if self.limit is not None:
             c.set_clim(0, self.limit)
