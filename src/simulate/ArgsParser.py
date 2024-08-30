@@ -15,6 +15,15 @@ class ArgsParser:
             help="Path to output dir. (default: %(default)s)",
             metavar="DIR",
         )
+        self.parser.add_argument(
+            "--experiment",
+            default=None,
+            help="Path to python script that overrides default Experiment definition. " +
+            "(default: %(default)s)",
+            type=str,
+            action="store",
+            metavar="PATH",
+        )
         exclusive = self.parser.add_mutually_exclusive_group()
         exclusive.add_argument(
             "-l",

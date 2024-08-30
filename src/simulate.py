@@ -1,16 +1,16 @@
 #!/bin/python
 
-from model.Experiment import Experiment
 from simulate.ArgsParser import ArgsParser
 from simulate.Initializer import Initializer
 import torch
+from model.ExperimentLoader import ExperimentLoader
 
 
 if __name__ == "__main__":
     argsParser = ArgsParser()
     argsParser.show()
     args = argsParser.get()
-    experiment = Experiment()
+    experiment = ExperimentLoader(args.experiment)
     initializer = Initializer(args, experiment)
     saver = initializer.get_saver()
     grid = initializer.get_grid()

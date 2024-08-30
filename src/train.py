@@ -11,13 +11,13 @@ if __name__ == "__main__":
     import asyncio
     import torch
     from train.Initializer import Initializer
-    from model.Experiment import Experiment
+    from model.ExperimentLoader import ExperimentLoader
     from train.Traininer import Trainer
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Running on {device}")
 
-    experiment = Experiment()
+    experiment = ExperimentLoader(args.experiment)
     initializer = Initializer(args, experiment, device)
     config = initializer.getPinnConfig()
 

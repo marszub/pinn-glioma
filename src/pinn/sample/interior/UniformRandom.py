@@ -13,7 +13,7 @@ class UniformRandom(SampleSpace):
     def get_points(self):
         x = self.__rand_uniform(self.timespace_domain.spaceDomains[0])
         y = self.__rand_uniform(self.timespace_domain.spaceDomains[1])
-        t = self.__rand_uniform(self.timespaceDomain.timeDomain)
+        t = self.__rand_uniform(self.timespace_domain.timeDomain)
         return x, y, t
 
     def __rand_uniform(self, domain: Tuple[float, float]):

@@ -118,6 +118,15 @@ class ArgsParser:
             action="store_true",
             dest="plot_transparent",
         )
+        parser.add_argument(
+            "--experiment",
+            default=None,
+            help="Path to python script that overrides default Experiment definition. " +
+            "(default: %(default)s)",
+            type=str,
+            action="store",
+            metavar="PATH",
+        )
         subparsers = parser.add_subparsers(
             title='Plot types',
             dest='plot_type',

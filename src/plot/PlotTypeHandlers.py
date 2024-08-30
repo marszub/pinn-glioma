@@ -1,5 +1,6 @@
 from pinn.simulationSpace.UniformSpace import UniformSpace
 from model.Experiment import Experiment
+from model.ExperimentLoader import ExperimentLoader
 
 
 def load_model(model_path: str, space: UniformSpace, experiment: Experiment):
@@ -58,7 +59,7 @@ def plot_animation(args):
     from plot.Plotter import Plotter
     from plot.Visualizer import Visualizer
 
-    experiment = Experiment()
+    experiment = ExperimentLoader(args.experiment)
     plotter = Plotter(limit=args.max_u, cmap=args.cmap)
     diffusion = None
     if args.background_diffusion:
@@ -85,7 +86,7 @@ def plot_initial_condition(args):
     from plot.Plotter import Plotter
     from plot.Visualizer import Visualizer
 
-    experiment = Experiment()
+    experiment = ExperimentLoader(args.experiment)
     plotter = Plotter(limit=args.max_u, cmap=args.cmap)
     diffusion = None
     if args.background_diffusion:
@@ -113,7 +114,7 @@ def plot_initial_condition(args):
 def plot_size_over_time(args):
     from plot.Visualizer import Visualizer
 
-    experiment = Experiment()
+    experiment = ExperimentLoader(args.experiment)
 
     timeResolution = 50
     spaceResoultion = 150
@@ -136,7 +137,7 @@ def plot_difference(args):
     from plot.Visualizer import Visualizer
     import torch
 
-    experiment = Experiment()
+    experiment = ExperimentLoader(args.experiment)
 
     timeResolution = 50
     spaceResoultion = 150
@@ -178,7 +179,7 @@ def plot_diffusion(args):
     from plot.Visualizer import Visualizer
     from plot.Plotter import Plotter
 
-    experiment = Experiment()
+    experiment = ExperimentLoader(args.experiment)
 
     timeResolution = 20
     spaceResoultion = 300
@@ -202,7 +203,7 @@ def plot_diffusion(args):
 def plot_treatment(args):
     from plot.Visualizer import Visualizer
 
-    experiment = Experiment()
+    experiment = ExperimentLoader(args.experiment)
 
     timeResolution = 20
     spaceResoultion = 300
@@ -224,7 +225,7 @@ def plot_loss(args):
     from pinn.Loader import loadMetrics
     import numpy as np
 
-    experiment = Experiment()
+    experiment = ExperimentLoader(args.experiment)
 
     timeResolution = 20
     spaceResoultion = 300
@@ -254,7 +255,7 @@ def plot_total_loss(args):
     from pinn.Loader import loadMetrics
     import numpy as np
 
-    experiment = Experiment()
+    experiment = ExperimentLoader(args.experiment)
 
     timeResolution = 20
     spaceResoultion = 300

@@ -70,6 +70,15 @@ class ArgsParser:
             help="Load previously trained model.",
             action="store",
         )
+        self.parser.add_argument(
+            "--experiment",
+            default=None,
+            help="Path to python script that overrides default Experiment definition. " +
+            "(default: %(default)s)",
+            type=str,
+            action="store",
+            metavar="PATH",
+        )
         self.config = self.parser.parse_args()
         self.config.data_dir = self.__trim_dir(self.config.data_dir)
         self.config.validation_dir = self.__trim_dir(
