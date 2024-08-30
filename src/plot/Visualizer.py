@@ -181,11 +181,11 @@ class Visualizer:
                 frameName = f"{self.file_prefix}_{self.i}.png"
                 points = self.plotter.dpi * \
                     max(self.plotter.figsize[0], self.plotter.figsize[1])
+                space = UniformSpace(self.space, spatial_resolution, 0)
+                x, y, _ = space.getInitialPointsKeepDims()
                 if spatial_resolution > 2 * points:
                     indices = list(range(0, spatial_resolution,
                                    spatial_resolution//points + 1))
-                    space = UniformSpace(self.space, spatial_resolution, 0)
-                    x, y, _ = space.getInitialPointsKeepDims()
                     x = x[indices][:, indices]
                     y = y[indices][:, indices]
                     u = u[indices][:, indices]

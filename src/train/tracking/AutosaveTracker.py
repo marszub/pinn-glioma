@@ -10,7 +10,7 @@ class AutosaveTracker(Tracker):
 
     def update(self, lossValue: tuple, nn: PINN, optimizer):
         super().update(lossValue, nn, optimizer)
-        if self.epoch % 10000 == 0 or not self.isTraining():
+        if self.epoch % 5000 == 0 or not self.isTraining():
             self.modelSaver.saveTraining(self.epoch, self.bestApprox, nn, optimizer, self.lossValues)
             self.modelSaver.saveEvalModel(self.bestApprox)
             self.modelSaver.saveMetrics(self.lossValues)

@@ -184,7 +184,7 @@ def plot_diffusion(args):
     timeResolution = 20
     spaceResoultion = 300
 
-    plotter = Plotter()
+    plotter = Plotter(cmap="bone")
     space = UniformSpace(
         timespaceDomain=experiment.timespaceDomain,
         spaceResoultion=spaceResoultion,
