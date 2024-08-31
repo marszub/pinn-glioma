@@ -3,7 +3,7 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd $SCRIPT_DIR/../../..
 echo Running from $(pwd)
-./src/simulate.py -s -o ./tmp/experiment1/simulation/ --experiment=$SCRIPT_DIR/Experiment.py \
+python ./src/simulate.py -s -o ./tmp/experiment1/simulation/ --experiment=$SCRIPT_DIR/Experiment.py \
     -r 4_000 -t 1_000_000
 if [ $? -ne 0 ]; then
     echo Simulation failed
