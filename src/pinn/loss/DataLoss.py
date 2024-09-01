@@ -44,6 +44,7 @@ class DataLoss:
         self.sample_size = samples_num
         self.dataset_size = self.input.shape[0]
         self.device = torch.device("cpu")
+        self.times = t_linspace
         # is_data indicates if member tensors exist.
         # If not, it means no data set was provided.
         self.is_data = True

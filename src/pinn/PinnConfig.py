@@ -10,20 +10,14 @@ class PinnConfig:
         validation_dir: str = None,
     ):
         from pinn.loss.SampleSizes import SampleSizes
-        from pinn.sample.interior.ExponentialRandom import ExponentialRandom
+        from pinn.sample.interior.DataFocusedRandom import DataFocusedRandom
         from pinn.loss.ResidualLoss import ResidualLoss
         from pinn.loss.BoundaryLoss import BoundaryLoss
         from pinn.loss.DataLoss import DataLoss
         from pinn.loss.ValidationLoss import ValidationLoss
+        from pinn.loss.ZeroLoss import ZeroLoss
 
         sample_sizes = SampleSizes.scaled(32)
-        interior_sample = ExponentialRandom(
-            timespace_domain=experiment.timespaceDomain,
-            sample_size=sample_sizes.interior,
-            rate=1.0
-        )
-        residual_loss = ResidualLoss(experiment, interior_sample)
-        from pinn.loss.ZeroLoss import ZeroLoss
         initial_loss = ZeroLoss()
 
         # from pinn.loss.InitialLoss import InitialLoss
@@ -41,6 +35,14 @@ class PinnConfig:
             sample_sizes.data,
             data_dir,
         )
+        interior_sample = DataFocusedRandom(
+            timespace_domain=experiment.timespaceDomain,
+            sample_size=sample_sizes.interior,
+            times=data_loss.times,
+            rate=0.2,
+        )
+        print(data_loss.times)
+        residual_loss = ResidualLoss(experiment, interior_sample)
         validation_loss = ValidationLoss(
             experiment.timespaceDomain,
             samples_num=sample_sizes.validation,

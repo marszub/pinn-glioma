@@ -11,4 +11,4 @@ mkdir -p ./tmp/experiment${EXPERIMENT}/
 (time ${SCRIPT_DIR}/simulate.sh) \
     &> ./tmp/experiment${EXPERIMENT}/simulation-log.txt
 (time $SCRIPT_DIR/train.sh) \
-    &> ./tmp/experiment${EXPERIMENT}/simulation-log.txt
+    &> ./tmp/experiment${EXPERIMENT}/training-log.txt

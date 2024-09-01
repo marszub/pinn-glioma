@@ -15,9 +15,9 @@ class DataFocusedRandom(SampleSpace):
     ):
         super().__init__(timespace_domain)
         self.sample_size = sample_size
-        self.times = torch.tesnor(times, device=self.device)
+        self.times = torch.tensor(times, device=self.device)
         self.times = self.times.reshape((-1,))
-        self.rate = torch.tesnor(rate, device=self.device)
+        self.rate = torch.tensor(rate, device=self.device)
         self.mean = torch.tensor(0.0, device=self.device)
 
     def get_points(self):
@@ -25,12 +25,16 @@ class DataFocusedRandom(SampleSpace):
         y = self.__rand_uniform(self.timespace_domain.spaceDomains[1])
         time_idx = torch.randint(
             0, self.times.shape[0], (self.sample_size, 1), device=self.device)
-        tMin, tMax = self.timespaceDomain.timeDomain
+        tMin, tMax = self.timespace_domain.timeDomain
         support_size = tMax - tMin
         sample = torch.distributions.laplace.Laplace(
             self.mean, self.rate).sample((self.sample_size, 1))
+        chosen_t = self.times[time_idx] + sample * support_size
+        abs_t = torch.where(chosen_t < torch.tensor(0.0, device=self.device),
+                            torch.rand(chosen_t.shape, device=self.device) * support_size + tMin,
+                            chosen_t)
         t = tMin + torch.fmod(
-            self.times[time_idx] + sample*support_size, support_size
+            abs_t, support_size
         )
         t.requires_grad = True
         return x, y, t
