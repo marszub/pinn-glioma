@@ -41,7 +41,6 @@ class PinnConfig:
             times=data_loss.times,
             rate=0.2,
         )
-        print(data_loss.times)
         residual_loss = ResidualLoss(experiment, interior_sample)
         validation_loss = ValidationLoss(
             experiment.timespaceDomain,
