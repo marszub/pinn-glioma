@@ -34,14 +34,12 @@ def load_comparable_models(
     if path.isdir(model1_path):
         print("model1 is simulation")
         model1 = SimulationLoader(model1_path, experiment.timespaceDomain)
-        space = model1.get_sample_space()
-        times = model1.get_times()
+        space, times = model1.get_sample_space_and_times()
 
     if path.isdir(model2_path):
         print("model2 is simulation")
         model2 = SimulationLoader(model2_path, experiment.timespaceDomain)
-        space = model2.get_sample_space()
-        times = model2.get_times()
+        space, times = model2.get_sample_space_and_times()
 
     if path.isfile(model1_path):
         print("model1 is pinn")
@@ -161,18 +159,18 @@ def plot_difference(args):
             assert torch.isclose(t1, t2)
             u1 = u1.reshape((-1,))
             u2 = u2.reshape((-1,))
-            diff = torch.sum(torch.abs(u1 - u2))
+            diff = torch.sum(torch.abs(u1 - u2)) / torch.sum(u1)
             diffs.append(diff)
             times.append(t1)
             u_size = torch.numel(u1)
         print(u_size)
         diffs = (
-            torch.tensor(diffs) /
+            torch.tensor(diffs) * 100.0 /
             experiment.timespaceDomain.get_points_per_space_unit(u_size)
         )
         times = torch.tensor(times)
         visualizer.plotSizeOverTime(
-            times, diffs, y_title="Tumor concentration difference")
+            times, diffs, y_title="Tumor concentration difference [%]")
 
 
 def plot_diffusion(args):

@@ -46,12 +46,14 @@ class SimulationLoader(DataProvider):
                 f"No simulation frames found in {self.input_dir}.")
         print(f"Loaded {i} files.")
 
-    def get_sample_space(self):
+    def get_sample_space_and_times(self):
         from pinn.simulationSpace.UniformSpace import UniformSpace
 
         u_shape = None
         time_resolution = 0
+        times = []
         for t, u in self.iterator():
+            times.append(t.detach().clone())
             time_resolution += 1
             assert u_shape is None or u_shape == u.shape, f"{u_shape} {u.shape}"
             u_shape = u.shape
@@ -61,10 +63,4 @@ class SimulationLoader(DataProvider):
             u.shape[1],
             time_resolution,
             requiresGrad=False,
-        )
-
-    def get_times(self):
-        times = []
-        for t, u in self.iterator():
-            times.append(t)
-        return times
+        ), times

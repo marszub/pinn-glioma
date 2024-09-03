@@ -14,9 +14,9 @@ class PinnEvaluator(DataProvider):
         times: Optional[list] = None
     ):
         super().__init__(space.timespaceDomain)
-        self.space = space
+        self.space = space.to(self.device)
 
-        self.pinn = loadModel(filename)
+        self.pinn = loadModel(filename).to(self.device)
 
         if times is None:
             times = [
@@ -43,13 +43,23 @@ class PinnEvaluator(DataProvider):
             action(time_value, u)
 
     def iterator(self):
-        x, y, _ = self.space.getInitialPointsKeepDims()
+        import torch
+        x_full, y_full, _ = self.space.getInitialPointsKeepDims()
+        shape = x_full.size()
+        x_full = x_full.reshape(-1, 1)
+        y_full = y_full.reshape(-1, 1)
         for time_value in self.times:
-            t = full_like(
-                x,
+            t_full = full_like(
+                x_full,
                 time_value,
             )
-            u = self.pinn(x, y, t)
+            xs = x_full.split(2**16)
+            ys = y_full.split(2**16)
+            ts = t_full.split(2**16)
+            us = []
+            for x, y, t in zip(xs, ys, ts):
+                us.append(self.pinn(x, y, t))
+            u = torch.cat(us, dim=0).reshape(shape)
             yield time_value, u
 
     def to(self, device):

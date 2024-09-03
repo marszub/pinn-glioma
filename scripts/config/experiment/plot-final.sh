@@ -8,6 +8,13 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd $SCRIPT_DIR/../../..
 
 python ./src/plot.py \
+    -o ./tmp/experiment${EXPERIMENT}/pinn-plots/difference \
+    --experiment=$SCRIPT_DIR/../experiment${EXPERIMENT}/Experiment.py \
+    --title "Experiment ${EXPERIMENT} PINN and GT difference" \
+    difference \
+    ./tmp/experiment${EXPERIMENT}/simulation \
+    ./tmp/experiment${EXPERIMENT}/pinn/model_best.pt
+python ./src/plot.py \
     -o ./tmp/experiment${EXPERIMENT}/pinn-plots/anim-pinn \
     --experiment=$SCRIPT_DIR/../experiment${EXPERIMENT}/Experiment.py \
     --title "Experiment ${EXPERIMENT} PINN prediction" \
@@ -29,10 +36,3 @@ python ./src/plot.py \
     --experiment=$SCRIPT_DIR/../experiment${EXPERIMENT}/Experiment.py \
     --title "Experiment ${EXPERIMENT} PINN total loss" \
     total_loss ./tmp/experiment${EXPERIMENT}/pinn/loss_over_time.txt
-python ./src/plot.py \
-    -o ./tmp/experiment${EXPERIMENT}/pinn-plots/difference \
-    --experiment=$SCRIPT_DIR/../experiment${EXPERIMENT}/Experiment.py \
-    --title "Experimetn ${EXPERIMENT} PINN and GT difference" \
-    difference \
-    ./tmp/experiment${EXPERIMENT}/pinn/model_best.pt \
-    ./tmp/experiment${EXPERIMENT}/simulation
