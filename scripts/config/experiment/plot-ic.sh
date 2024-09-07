@@ -11,7 +11,7 @@ echo Running from $(pwd)
 python ./src/plot.py \
     -o ./tmp/experiment${EXPERIMENT}/constraints-plot/ic \
     --experiment=$SCRIPT_DIR/../experiment${EXPERIMENT}/Experiment.py \
-    --title "Initial condition for Experiment ${EXPERIMENT}" \
+    --title "Initial state for Experiment ${EXPERIMENT}" \
     ic --background-diffusion
 python ./src/plot.py \
     -o ./tmp/experiment${EXPERIMENT}/constraints-plot/treatment \

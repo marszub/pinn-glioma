@@ -139,10 +139,10 @@ class Visualizer:
         )
         f = treatment(0, 0, t)
 
-        plt.figure(figsize=(20, 6))
+        plt.figure(figsize=(12, 4), dpi=200)
         plt.plot(t, f)
-        plt.xlabel('Time in days')
-        plt.ylabel('Therapy factor')
+        plt.xlabel('t')
+        plt.ylabel('R(t)')
         plt.title(make_title(self.title))
         plt.grid(True)
         plt.savefig(

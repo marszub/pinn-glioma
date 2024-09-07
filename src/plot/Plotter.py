@@ -6,7 +6,7 @@ from torch import Tensor
 class Plotter:
     def __init__(
         self,
-        figsize=(8, 6),
+        figsize=(5, 6),
         dpi=200,
         cmap="viridis",
         limit=None
