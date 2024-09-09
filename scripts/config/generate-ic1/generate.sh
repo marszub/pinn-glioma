@@ -12,4 +12,4 @@ fi
 python ./scripts/sim_state_to_ic.py ./tmp/generate-ic1/sim_state_99.pt ./tmp/generate-ic1/ic1.pt
 
 python ./src/plot.py -o ./tmp/generate-ic1/anim-sim --experiment $SCRIPT_DIR/Experiment.py \
---title "Generating initial condition 1" animation --max-u 1.0 ./tmp/generate-ic1
+--title "Generated initial state 1" animation --max-u 1.0 ./tmp/generate-ic1

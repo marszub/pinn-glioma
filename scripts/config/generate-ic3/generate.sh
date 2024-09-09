@@ -11,5 +11,4 @@ fi
 
 python ./scripts/sim_state_to_ic.py ./tmp/generate-ic3/sim_state_99.pt ./tmp/generate-ic3/ic3.pt
 
-python ./src/plot.py -o ./tmp/generate-ic3/anim-sim --experiment $SCRIPT_DIR/Experiment.py \
---title "Generating initial condition 3" animation --max-u 1.0 ./tmp/generate-ic3
+${SCRIPT_DIR}/animate.sh

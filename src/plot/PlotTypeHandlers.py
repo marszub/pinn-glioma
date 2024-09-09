@@ -114,7 +114,7 @@ def plot_size_over_time(args):
 
     experiment = ExperimentLoader(args.experiment)
 
-    timeResolution = 50
+    timeResolution = 100
     spaceResoultion = 150
 
     space = UniformSpace(
@@ -271,5 +271,6 @@ def plot_total_loss(args):
     if lossOverTime is None:
         print("Failed to load")
         exit()
-    totalLoss = lossOverTime[:, :1]
-    visualizer.plotLossMinMax(totalLoss)
+    loss_idx = args.loss_idx
+    losses = lossOverTime[:, loss_idx:loss_idx+1]
+    visualizer.plotLossMinMax(losses)

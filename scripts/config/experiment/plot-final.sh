@@ -36,3 +36,9 @@ python ./src/plot.py \
     --experiment=$SCRIPT_DIR/../experiment${EXPERIMENT}/Experiment.py \
     --title "Experiment ${EXPERIMENT} PINN total loss" \
     total_loss ./tmp/experiment${EXPERIMENT}/pinn/loss_over_time.txt
+python ./src/plot.py \
+    -o ./tmp/experiment${EXPERIMENT}/pinn-plots/validation-loss \
+    --experiment=$SCRIPT_DIR/../experiment${EXPERIMENT}/Experiment.py \
+    --title "Experiment ${EXPERIMENT} PINN validation loss" \
+    total_loss ./tmp/experiment${EXPERIMENT}/pinn/loss_over_time.txt \
+    --validation

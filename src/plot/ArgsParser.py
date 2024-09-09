@@ -189,13 +189,22 @@ class ArgsParser:
             "(initial, boudary, residual, data) and the total loss.",
             parents=[loss_parser],
         ).set_defaults(handler=plot_loss)
-        subparsers.add_parser(
+        total_loss_parser = subparsers.add_parser(
             'total_loss',
             aliases=['tloss'],
-            help="Averrage total loss in intervals over training time. " +
+            help="Averrage loss in intervals over training time. " +
             "Plot also shows the best fit and minimum and maximum loss value in each interval.",
             parents=[loss_parser],
-        ).set_defaults(handler=plot_total_loss)
+        )
+        total_loss_parser.add_argument(
+            "--validation",
+            help="Plot validation loss instead of total loss. (default: total)",
+            action="store_const",
+            dest="loss_idx",
+            default=0,
+            const=5,
+        )
+        total_loss_parser.set_defaults(handler=plot_total_loss)
 
         self.config = parser.parse_args()
 
