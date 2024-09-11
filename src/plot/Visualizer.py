@@ -135,13 +135,14 @@ class Visualizer:
         show_legend = True
         if labels is None:
             labels = ["" for i in times]
-            show_legend = False
+            if data_times is None:
+                show_legend = False
         for time, size, label in zip(times, sizes, labels):
             ax.plot(time, size, label=label)
         if data_times is not None:
             bot, top = ax.get_ylim()
             ax.vlines(data_times, bot, top,
-                      label="Training data", colors="r")
+                      label="Training data", colors="r", linestyles="dotted")
         if show_legend:
             ax.legend()
         fig.tight_layout()
