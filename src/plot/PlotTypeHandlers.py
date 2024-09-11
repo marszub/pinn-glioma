@@ -1,18 +1,20 @@
 from pinn.simulationSpace.UniformSpace import UniformSpace
 from model.Experiment import Experiment
 from model.ExperimentLoader import ExperimentLoader
+import torch
 
 
 def load_model(model_path: str, space: UniformSpace, experiment: Experiment):
     from os import path
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if path.isfile(model_path):
         from plot.PinnEvaluator import PinnEvaluator
-        return PinnEvaluator(model_path, space)
+        return PinnEvaluator(model_path, space).to(device)
     elif path.isdir(model_path):
         from plot.SimulationLoader import SimulationLoader
         return SimulationLoader(
-            model_path, experiment.timespaceDomain)
+            model_path, experiment.timespaceDomain).to(device)
     print(f"File {model_path} does not exist")
     exit()
 
@@ -21,7 +23,7 @@ def load_comparable_models(
     model1_path: str,
     model2_path: str,
     space: UniformSpace,
-    experiment: Experiment
+    experiment: Experiment,
 ):
     from os import path
     from plot.SimulationLoader import SimulationLoader
@@ -50,7 +52,8 @@ def load_comparable_models(
         model2 = PinnEvaluator(model2_path, space, times)
 
     assert model1 is not None and model2 is not None
-    return model1, model2
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    return model1.to(device), model2.to(device)
 
 
 def plot_animation(args):
@@ -63,7 +66,7 @@ def plot_animation(args):
     if args.background_diffusion:
         diffusion = experiment.diffusion
 
-    timeResolution = 20
+    timeResolution = 21
     spaceResoultion = 300
 
     space = UniformSpace(
@@ -111,6 +114,7 @@ def plot_initial_condition(args):
 
 def plot_size_over_time(args):
     from plot.Visualizer import Visualizer
+    import torch
 
     experiment = ExperimentLoader(args.experiment)
 
@@ -126,9 +130,31 @@ def plot_size_over_time(args):
     visualizer = Visualizer(
         space, args.output, args.title, args.plot_transparent
     )
-    data_provider = load_model(args.input, space, experiment)
-    times, sizes = data_provider.get_size_over_time()
-    visualizer.plotSizeOverTime(times, sizes, y_title="Tumor size")
+    train_data_times = None
+    if args.train_data is not None:
+        from model.DataLoader import DataLoader
+        data_loader = DataLoader(args.train_data)
+        _, train_data_times = data_loader.get_data(data_loader.get_indices())
+    with torch.no_grad():
+        if args.other_model is None:
+            data_provider = load_model(args.input, space, experiment)
+            times, sizes = data_provider.get_size_over_time()
+            visualizer.plot_multiple_sot(
+                [times], [sizes], y_label="Tumor size", data_times=train_data_times)
+        else:
+            model1, model2 = load_comparable_models(
+                args.input, args.other_model, space, experiment
+            )
+            times1, sizes1 = model1.get_size_over_time()
+            times2, sizes2 = model2.get_size_over_time()
+            assert torch.equal(times1, times2)
+            visualizer.plot_multiple_sot(
+                [times2, times1],
+                [sizes2, sizes1],
+                y_label="Tumor size",
+                labels=["Ground truth", "PINN prediction"],
+                data_times=train_data_times,
+            )
 
 
 def plot_difference(args):
@@ -149,6 +175,12 @@ def plot_difference(args):
     visualizer = Visualizer(
         space, args.output, args.title, args.plot_transparent
     )
+    train_data_times = None
+    if args.train_data is not None:
+        from model.DataLoader import DataLoader
+        data_loader = DataLoader(args.train_data)
+        _, train_data_times = data_loader.get_data(data_loader.get_indices())
+
     with torch.no_grad():
         model1_data, model2_data = load_comparable_models(
             args.model1, args.model2, space, experiment)
@@ -169,8 +201,8 @@ def plot_difference(args):
             experiment.timespaceDomain.get_points_per_space_unit(u_size)
         )
         times = torch.tensor(times)
-        visualizer.plotSizeOverTime(
-            times, diffs, y_title="Tumor concentration difference [%]")
+        visualizer.plot_multiple_sot(
+            [times], [diffs], y_label="Tumor concentration difference [%]", data_times=train_data_times)
 
 
 def plot_diffusion(args):

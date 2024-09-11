@@ -80,7 +80,7 @@ class Visualizer:
 
     def plotLosses(self, loss_over_time, labels=[]):
         average_loss = self.__runningAverrage(loss_over_time, window=100)
-        fig, ax = plt.subplots(figsize=(8, 6), dpi=100)
+        fig, ax = plt.subplots(figsize=(4, 3), dpi=400)
         ax.set_title(make_title(self.title))
         ax.set_xlabel("Epoch")
         ax.set_ylabel("Loss")
@@ -88,6 +88,7 @@ class Visualizer:
         ax.set_yscale("log")
         if len(labels) > 0:
             plt.legend()
+        fig.tight_layout()
         plt.savefig(
             f"{self.file_prefix}.png", transparent=self.transparent
         )
@@ -103,7 +104,7 @@ class Visualizer:
         globalMinX = np.argmin(minLoss)
         globalMinY = np.min(minLoss)
 
-        fig, ax = plt.subplots(figsize=(8, 6), dpi=100)
+        fig, ax = plt.subplots(figsize=(4, 3), dpi=400)
         ax.set_title(make_title(self.title))
         ax.set_xlabel("Epoch")
         ax.set_ylabel("Loss")
@@ -114,18 +115,36 @@ class Visualizer:
                 "r.", markersize=12, label="Best fit")
         ax.set_yscale("log")
         plt.legend()
+        fig.tight_layout()
         plt.savefig(
             f"{self.file_prefix}.png", transparent=self.transparent
         )
 
-    def plotSizeOverTime(
-        self, times: Tensor, sizes: Tensor, y_title: str
+    def plot_multiple_sot(
+        self,
+        times: list,
+        sizes: list,
+        y_label: str,
+        labels: list = None,
+        data_times: list = None,
     ):
-        fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
+        fig, ax = plt.subplots(figsize=(5, 3.5), dpi=400)
         ax.set_title(make_title(self.title))
         ax.set_xlabel("Time [days]")
-        ax.set_ylabel(y_title)
-        ax.plot(times, sizes)
+        ax.set_ylabel(y_label)
+        show_legend = True
+        if labels is None:
+            labels = ["" for i in times]
+            show_legend = False
+        for time, size, label in zip(times, sizes, labels):
+            ax.plot(time, size, label=label)
+        if data_times is not None:
+            bot, top = ax.get_ylim()
+            ax.vlines(data_times, bot, top,
+                      label="Training data", colors="r")
+        if show_legend:
+            ax.legend()
+        fig.tight_layout()
         plt.savefig(
             f"{self.file_prefix}.png",
             transparent=self.transparent
@@ -139,12 +158,13 @@ class Visualizer:
         )
         f = treatment(0, 0, t)
 
-        plt.figure(figsize=(12, 4), dpi=200)
+        plt.figure(figsize=(5, 3), dpi=400)
         plt.plot(t, f)
         plt.xlabel('t')
         plt.ylabel('R(t)')
         plt.title(make_title(self.title))
         plt.grid(True)
+        plt.tight_layout()
         plt.savefig(
             f"{self.file_prefix}.png", transparent=self.transparent
         )
@@ -155,6 +175,21 @@ class Visualizer:
         plotter: Plotter,
         diffusion: Callable = None
     ):
+        # This is dumb, but required to make sure, all plots are pixel-perfect the same.
+        # Somehow first 7 plots change size and position in figure...
+        dummy_tensor = torch.tensor([[0.0, 1.0], [0.0, 1.0]])
+        for i in range(6):
+            plotter.plot(
+                dummy_tensor,
+                dummy_tensor,
+                dummy_tensor,
+                "",
+            )
+            plt.figure().clear()
+            plt.close()
+            plt.cla()
+            plt.clf()
+
         class Iteration:
             def __init__(
                 self,
@@ -191,7 +226,10 @@ class Visualizer:
                     u = u[indices][:, indices]
                 x = x.squeeze(axis=-1)
                 y = y.squeeze(axis=-1)
-                title = make_title(self.title + [f"(t={t:4.2f})"])
+                if len(self.title) == 0:
+                    title = ""
+                else:
+                    title = make_title(self.title + [f"(t={t:4.2f})"])
                 if self.diffusion is None:
                     _ = self.plotter.plot(
                         u,
@@ -215,6 +253,10 @@ class Visualizer:
                     transparent=self.transparent,
                     facecolor="white",
                 )
+                plt.figure().clear()
+                plt.close()
+                plt.cla()
+                plt.clf()
                 self.i += 1
 
         iteration = Iteration(

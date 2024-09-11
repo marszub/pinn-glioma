@@ -1,13 +1,14 @@
 from matplotlib import pyplot as plt, colors
 import numpy as np
 from torch import Tensor
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
 class Plotter:
     def __init__(
         self,
-        figsize=(5, 6),
-        dpi=200,
+        figsize=(3, 4),
+        dpi=400,
         cmap="viridis",
         limit=None
     ):
@@ -47,7 +48,12 @@ class Plotter:
         c = ax.pcolormesh(X, Y, Z, cmap=self.cmap)
         if self.limit is not None:
             c.set_clim(0, self.limit)
-        fig.colorbar(c, ax=ax)
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="8%", pad=0.1)
+
+        # plt.colorbar(im, cax=cax)
+        fig.colorbar(c, ax=ax, cax=cax)
+        fig.tight_layout()
 
         return fig
 
@@ -77,7 +83,6 @@ class Plotter:
             vmin=0,
             vmax=2*np.max(backgroundZ),
         )
-        lim = self.limit if self.limit is not None else Z.max()
         c = ax.pcolormesh(
             X.squeeze(),
             Y.squeeze(),
@@ -86,6 +91,11 @@ class Plotter:
         )
         if self.limit is not None:
             c.set_clim(0, self.limit)
-        fig.colorbar(c, ax=ax)
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="8%", pad=0.1)
+
+        # plt.colorbar(im, cax=cax)
+        fig.colorbar(c, ax=ax, cax=cax)
+        fig.tight_layout()
 
         return fig

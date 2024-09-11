@@ -26,10 +26,10 @@ class PinnEvaluator(DataProvider):
                     self.space.timespaceDomain.timeDomain[1]
                     - self.space.timespaceDomain.timeDomain[0]
                 )
-                / self.space.timeResoultion
+                / (self.space.timeResoultion - 1)
                 for i in range(self.space.timeResoultion)
             ]
-            times = tensor(times).to(self.device)
+        times = tensor(times).to(self.device)
         self.times = times
 
     def for_each_frame(self, action: Callable):
@@ -63,7 +63,7 @@ class PinnEvaluator(DataProvider):
             yield time_value, u
 
     def to(self, device):
-        super().to(device)
         self.pinn = self.pinn.to(device)
         self.space = self.space.to(device)
         self.times = self.times.to(device)
+        return super().to(device)
