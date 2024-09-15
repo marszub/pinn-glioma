@@ -17,7 +17,7 @@ class Experiment:
         )
         self.treatment = Treatment(
             absorptionRate=0.05,
-            decayRate=0.004,
+            decayRate=0.005,
             dose=0.08,
             firstDoseTime=15.0,
             dosesNum=3,
