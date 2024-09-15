@@ -161,7 +161,7 @@ class Visualizer:
 
         plt.figure(figsize=(5, 3), dpi=400)
         plt.plot(t, f)
-        plt.xlabel('t')
+        plt.xlabel('Time [days]')
         plt.ylabel('R(t)')
         plt.title(make_title(self.title))
         plt.grid(True)

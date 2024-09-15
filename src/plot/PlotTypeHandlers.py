@@ -194,11 +194,8 @@ def plot_difference(args):
             diff = torch.sum(torch.abs(u1 - u2)) / torch.sum(u1)
             diffs.append(diff)
             times.append(t1)
-            u_size = torch.numel(u1)
-        print(u_size)
         diffs = (
-            torch.tensor(diffs) * 100.0 /
-            experiment.timespaceDomain.get_points_per_space_unit(u_size)
+            torch.tensor(diffs) * 100.0
         )
         times = torch.tensor(times)
         visualizer.plot_multiple_sot(
