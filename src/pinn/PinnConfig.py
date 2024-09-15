@@ -11,6 +11,7 @@ class PinnConfig:
     ):
         from pinn.loss.SampleSizes import SampleSizes
         from pinn.sample.interior.DataFocusedRandom import DataFocusedRandom
+        # from pinn.sample.interior.UniformRandom import UniformRandom
         from pinn.loss.ResidualLoss import ResidualLoss
         from pinn.loss.BoundaryLoss import BoundaryLoss
         from pinn.loss.DataLoss import DataLoss
@@ -20,12 +21,6 @@ class PinnConfig:
         sample_sizes = SampleSizes.scaled(32)
         initial_loss = ZeroLoss()
 
-        # from pinn.loss.InitialLoss import InitialLoss
-        # initial_loss = InitialLoss(
-        #     experiment.timespaceDomain,
-        #     sample_sizes.initial,
-        #     experiment.ic,
-        # )
         boundary_loss = BoundaryLoss(
             experiment.timespaceDomain,
             sample_sizes.boundary,
@@ -35,6 +30,10 @@ class PinnConfig:
             sample_sizes.data,
             data_dir,
         )
+        # interior_sample = UniformRandom(
+        #     timespace_domain=experiment.timespaceDomain,
+        #     sample_size=sample_sizes.interior,
+        # )
         interior_sample = DataFocusedRandom(
             timespace_domain=experiment.timespaceDomain,
             sample_size=sample_sizes.interior,
