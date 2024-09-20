@@ -76,6 +76,8 @@ class Visualizer:
         plt.savefig(
             f"{self.file_prefix}.png",
             transparent=self.transparent,
+            pad_inches=0,
+            bbox_inches='tight',
         )
 
     def plotLosses(self, loss_over_time, labels=[]):
@@ -90,7 +92,10 @@ class Visualizer:
             plt.legend()
         fig.tight_layout()
         plt.savefig(
-            f"{self.file_prefix}.png", transparent=self.transparent
+            f"{self.file_prefix}.png",
+            transparent=self.transparent,
+            pad_inches=0,
+            bbox_inches='tight',
         )
 
     def plotLossMinMax(self, lossOverTime):
@@ -117,7 +122,10 @@ class Visualizer:
         plt.legend()
         fig.tight_layout()
         plt.savefig(
-            f"{self.file_prefix}.png", transparent=self.transparent
+            f"{self.file_prefix}.png",
+            transparent=self.transparent,
+            pad_inches=0,
+            bbox_inches='tight',
         )
 
     def plot_multiple_sot(
@@ -148,7 +156,9 @@ class Visualizer:
         fig.tight_layout()
         plt.savefig(
             f"{self.file_prefix}.png",
-            transparent=self.transparent
+            transparent=self.transparent,
+            pad_inches=0,
+            bbox_inches='tight',
         )
 
     def plotTreatment(self, treatment: Callable):
@@ -167,7 +177,10 @@ class Visualizer:
         plt.grid(True)
         plt.tight_layout()
         plt.savefig(
-            f"{self.file_prefix}.png", transparent=self.transparent
+            f"{self.file_prefix}.png",
+            transparent=self.transparent,
+            pad_inches=0,
+            bbox_inches='tight',
         )
 
     def animateProgress(
@@ -253,6 +266,8 @@ class Visualizer:
                     frameName,
                     transparent=self.transparent,
                     facecolor="white",
+                    pad_inches=0,
+                    bbox_inches='tight',
                 )
                 plt.figure().clear()
                 plt.close()
